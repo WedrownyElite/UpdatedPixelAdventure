@@ -1,8 +1,6 @@
 #pragma once
 #include "olcPixelGameEngine.h"
 #include "olcPGEX_TransformedView.h"
-#define ANIMATOR_IMPLEMENTATION
-#include "olcPGEX_Animator2D.h"
 
 class Player {
 public:
@@ -26,8 +24,6 @@ public:
 	olc::Decal* PlayerDeadDecal;
 	olc::Decal* ShadowDecal;
 	olc::Decal* WalkLeftSSDecal;
-
-	olcPGEX_Animator2D animator;
 
 	void DrawPlayer(olc::TransformedView& tv);
 	void Initialize(olc::PixelGameEngine* pge);

@@ -3,6 +3,8 @@
 #define OLC_PGEX_TRANSFORMEDVIEW
 #include "olcPGEX_TransformedView.h"
 #include "olcUTIL_Camera2D.h"
+#define ANIMATOR_IMPLEMENTATION
+#include "olcPGEX_Animator2D.h"
 
 #include "Player.h"
 
@@ -51,6 +53,7 @@ public:
 	}
 	bool OnUserUpdate(float fElapsedTime) override {
 		DrawBGCamera();
+		P.DrawPlayer(tv);
 		return true;
 	}
 private:
@@ -77,6 +80,7 @@ private:
 		for (int i = 0; i < vWorldMap.size(); i++)
 			vWorldMap[i] = ((rand() % 20) == 1) ? 1 : 0;
 
+		P.Initialize(this);
 		return true;
 	}
 };
