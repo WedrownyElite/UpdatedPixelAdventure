@@ -1,11 +1,10 @@
 #pragma once
 #include "olcPixelGameEngine.h"
 #include "olcPGEX_TransformedView.h"
+#include "GlobalVars.h"
 
 class Player {
 public:
-
-	olc::vf2d PlayerPos = { 300.0f, 300.0f };
 	bool WalkingLeft = false;
 	bool WalkingRight = false;
 	//False = left, True = right

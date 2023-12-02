@@ -4,13 +4,13 @@
 olcPGEX_Animator2D animator;
 void Player::DrawPlayer(olc::TransformedView& tv) {
 	if (Player::Dir == false) {
-		tv.DrawDecal(Player::PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
+		tv.DrawDecal(GlobalVars::PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
 	}
 	if (Player::Dir == true) {
-		tv.DrawDecal(Player::PlayerPos, PlayerRightDecal, { 4.0f, 4.0f });
+		tv.DrawDecal(GlobalVars::PlayerPos, PlayerRightDecal, { 4.0f, 4.0f });
 	}
 	else {
-		tv.DrawDecal(Player::PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
+		tv.DrawDecal(GlobalVars::PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
 	}
 }
 void Player::Initialize(olc::PixelGameEngine* pge) {

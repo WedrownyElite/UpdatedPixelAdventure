@@ -6,9 +6,12 @@
 #define ANIMATOR_IMPLEMENTATION
 #include "olcPGEX_Animator2D.h"
 
-#include "Player.h"
+#include <iostream>
 
+#include "Player.h"
+#include "GlobalVars.h"
 Player P;
+GlobalVars GV;
 
 class Pixel_Adventure : public olc::PixelGameEngine {
 public:
@@ -24,6 +27,8 @@ public:
 	// The world map, stored as a 1D array
 	std::vector<uint8_t> vWorldMap;
 
+	olc::vf2d MousePos = { 300, 300 };
+
 	//Sprites
 	std::unique_ptr<olc::Sprite> Grass;
 	//Decals
@@ -33,6 +38,23 @@ public:
 		sAppName = "Pixel Adventure";
 	}
 
+	olc::vf2d MousePosFunc() {
+		MousePos = GetMousePos() / 32 + tv.GetWorldOffset();
+		return MousePos;
+	}
+	void DebugVariables() {
+		std::string MousePosXString = std::to_string(MousePos.x);
+		std::string MousePosYString = std::to_string(MousePos.y);
+
+		DrawStringDecal({ 10.0f, 10.0f }, MousePosXString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 250.0f, 10.0f }, MousePosYString, olc::WHITE, { 2.0f, 2.0f });
+
+		std::string PlayerPosXString = std::to_string(GV.PlayerPos.x);
+		std::string PlayerPosYString = std::to_string(GV.PlayerPos.y);
+
+		DrawStringDecal({ 10.0f, 80.0f }, PlayerPosXString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 250.0f, 80.0f }, PlayerPosYString, olc::WHITE, { 2.0f, 2.0f });
+	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles
 		olc::vi2d vTileTL = tv.GetTopLeftTile().max({ 0,0 });
@@ -54,6 +76,8 @@ public:
 	bool OnUserUpdate(float fElapsedTime) override {
 		DrawBGCamera();
 		P.DrawPlayer(tv);
+		MousePos = MousePosFunc();
+		DebugVariables();
 		return true;
 	}
 private:
@@ -67,10 +91,10 @@ private:
 		tv = olc::TileTransformedView(GetScreenSize(), m_vTileSize);
 
 		// Construct Camera
-		camera = olc::utils::Camera2D(GetScreenSize() / m_vTileSize, P.PlayerPos);
+		camera = olc::utils::Camera2D(GetScreenSize() / m_vTileSize, GV.PlayerPos);
 
 		// Configure Camera
-		camera.SetTarget(P.PlayerPos);
+		camera.SetTarget(GV.PlayerPos);
 		camera.SetMode(olc::utils::Camera2D::Mode::LazyFollow);
 		camera.SetWorldBoundary({ 0.0f, 0.0f }, m_vWorldSize);
 		camera.EnableWorldBoundary(true);

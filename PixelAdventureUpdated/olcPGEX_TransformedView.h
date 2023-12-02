@@ -122,7 +122,7 @@ namespace olc
 		olc::vf2d m_vRecipPixel = { 1.0f, 1.0f };
 		olc::vf2d m_vPixelScale = { 1.0f, 1.0f };
 		bool m_bPanning = false;
-		olc::vf2d m_vStartPan = { 0.0f, 0.0f };
+		olc::vf2d m_vStartPan = { 300.0f, 300.0f };
 		olc::vi2d m_vViewArea;
 
 	public: // Hopefully, these should look familiar!
