@@ -84,13 +84,11 @@ public:
 		tv.SetWorldOffset(camera.GetViewPosition());
 
 		//Player input
-		P.PlayerInput(this, PlayerSpeed);
+		PlayerPos = P.PlayerInput(this, PlayerSpeed);
 		//Draw background
 		DrawBGCamera();
 		//Update mouse pos (tv offset)
 		MousePos = MousePosFunc();
-		//Update PlayerPos for outside functions
-		PlayerPos = P.ReturnPlayerPos();
 		//Draw Player
 		P.DrawPlayer(tv);
 		//Draw debug variables

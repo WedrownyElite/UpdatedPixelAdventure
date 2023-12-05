@@ -12,25 +12,31 @@ olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed) {
 	}
 	if (pge->GetKey(olc::Key::A).bHeld || pge->GetKey(olc::Key::LEFT).bHeld) {
 		PlayerPos.x -= PlayerSpeed;
+		Player::Dir = false;
+		WalkingLeft = true;
+		WalkingRight = false;
 	}
 	if (pge->GetKey(olc::Key::D).bHeld || pge->GetKey(olc::Key::RIGHT).bHeld) {
 		PlayerPos.x += PlayerSpeed;
+		Player::Dir = true;
+		WalkingLeft = false;
+		WalkingRight = true;
 	}
 
 	return PlayerPos;
 }
-olc::vf2d Player::ReturnPlayerPos() {
-	return PlayerPos;
-}
 void Player::DrawPlayer(olc::TransformedView& tv) {
 	if (Player::Dir == false) {
-		tv.DrawDecal(PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
+		tv.DrawDecal({ PlayerPos.x - 1.5f, PlayerPos.y - 1.0f }, PlayerLeftDecal, { 4.0f, 4.0f });
+		tv.DrawRectDecal(PlayerPos, { 1.0f, 2.0f }, olc::WHITE);
 	}
 	if (Player::Dir == true) {
-		tv.DrawDecal(PlayerPos, PlayerRightDecal, { 4.0f, 4.0f });
+		tv.DrawDecal({ PlayerPos.x - 1.4f, PlayerPos.y - 1.0f }, PlayerRightDecal, { 4.0f, 4.0f });
+		tv.DrawRectDecal(PlayerPos, { 1.0f, 2.0f }, olc::WHITE);
 	}
 	else {
-		tv.DrawDecal(PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
+		tv.DrawDecal({ PlayerPos.x - 1.5f, PlayerPos.y - 1.0f }, PlayerLeftDecal, { 4.0f, 4.0f });
+		tv.DrawRectDecal(PlayerPos, { 1.0f, 2.0f }, olc::WHITE);
 	}
 }
 void Player::Initialize(olc::PixelGameEngine* pge) {

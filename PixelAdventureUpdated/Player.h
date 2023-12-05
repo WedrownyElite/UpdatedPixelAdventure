@@ -27,7 +27,6 @@ public:
 	olc::Decal* WalkLeftSSDecal;
 
 	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed);
-	olc::vf2d ReturnPlayerPos();
 	void DrawPlayer(olc::TransformedView& tv);
 	void Initialize(olc::PixelGameEngine* pge);
 
