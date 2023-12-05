@@ -4,9 +4,11 @@
 #include "GlobalVars.h"
 
 class Player {
+
 public:
 	bool WalkingLeft = false;
 	bool WalkingRight = false;
+	olc::vf2d PlayerPos = { 300, 300 };
 	//False = left, True = right
 	bool Dir = false;
 
@@ -24,6 +26,8 @@ public:
 	olc::Decal* ShadowDecal;
 	olc::Decal* WalkLeftSSDecal;
 
+	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed);
+	olc::vf2d ReturnPlayerPos();
 	void DrawPlayer(olc::TransformedView& tv);
 	void Initialize(olc::PixelGameEngine* pge);
 

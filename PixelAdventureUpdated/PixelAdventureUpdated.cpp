@@ -27,8 +27,11 @@ public:
 	// The world map, stored as a 1D array
 	std::vector<uint8_t> vWorldMap;
 
+	float PlayerSpeed;
+
 	olc::vf2d MousePos = { 300, 300 };
 
+	olc::vf2d PlayerPos = { 300, 300 };
 	//Sprites
 	std::unique_ptr<olc::Sprite> Grass;
 	//Decals
@@ -42,15 +45,15 @@ public:
 		MousePos = GetMousePos() / 32 + tv.GetWorldOffset();
 		return MousePos;
 	}
-	void DebugVariables() {
+	void DebugVariables(olc::vf2d PlayerPos) {
 		std::string MousePosXString = std::to_string(MousePos.x);
 		std::string MousePosYString = std::to_string(MousePos.y);
 
 		DrawStringDecal({ 10.0f, 10.0f }, MousePosXString, olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 250.0f, 10.0f }, MousePosYString, olc::WHITE, { 2.0f, 2.0f });
 
-		std::string PlayerPosXString = std::to_string(GV.PlayerPos.x);
-		std::string PlayerPosYString = std::to_string(GV.PlayerPos.y);
+		std::string PlayerPosXString = std::to_string(PlayerPos.x);
+		std::string PlayerPosYString = std::to_string(PlayerPos.y);
 
 		DrawStringDecal({ 10.0f, 80.0f }, PlayerPosXString, olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 250.0f, 80.0f }, PlayerPosYString, olc::WHITE, { 2.0f, 2.0f });
@@ -74,10 +77,24 @@ public:
 			}
 	}
 	bool OnUserUpdate(float fElapsedTime) override {
+		PlayerSpeed = 6.0f * fElapsedTime;
+
+		//Camera variables
+		bool bOnScreen = camera.Update(fElapsedTime);
+		tv.SetWorldOffset(camera.GetViewPosition());
+
+		//Player input
+		P.PlayerInput(this, PlayerSpeed);
+		//Draw background
 		DrawBGCamera();
-		P.DrawPlayer(tv);
+		//Update mouse pos (tv offset)
 		MousePos = MousePosFunc();
-		DebugVariables();
+		//Update PlayerPos for outside functions
+		PlayerPos = P.ReturnPlayerPos();
+		//Draw Player
+		P.DrawPlayer(tv);
+		//Draw debug variables
+		DebugVariables(PlayerPos);
 		return true;
 	}
 private:
@@ -91,10 +108,10 @@ private:
 		tv = olc::TileTransformedView(GetScreenSize(), m_vTileSize);
 
 		// Construct Camera
-		camera = olc::utils::Camera2D(GetScreenSize() / m_vTileSize, GV.PlayerPos);
+		camera = olc::utils::Camera2D(GetScreenSize() / m_vTileSize, PlayerPos);
 
 		// Configure Camera
-		camera.SetTarget(GV.PlayerPos);
+		camera.SetTarget(PlayerPos);
 		camera.SetMode(olc::utils::Camera2D::Mode::LazyFollow);
 		camera.SetWorldBoundary({ 0.0f, 0.0f }, m_vWorldSize);
 		camera.EnableWorldBoundary(true);
