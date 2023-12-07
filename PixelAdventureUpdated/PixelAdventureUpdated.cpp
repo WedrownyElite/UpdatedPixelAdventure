@@ -46,17 +46,28 @@ public:
 		return MousePos;
 	}
 	void DebugVariables(olc::vf2d PlayerPos) {
+		//MousePos (tv offset)
 		std::string MousePosXString = std::to_string(MousePos.x);
 		std::string MousePosYString = std::to_string(MousePos.y);
 
 		DrawStringDecal({ 10.0f, 10.0f }, MousePosXString, olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 250.0f, 10.0f }, MousePosYString, olc::WHITE, { 2.0f, 2.0f });
 
+		//PlayerPos
 		std::string PlayerPosXString = std::to_string(PlayerPos.x);
 		std::string PlayerPosYString = std::to_string(PlayerPos.y);
 
 		DrawStringDecal({ 10.0f, 80.0f }, PlayerPosXString, olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 250.0f, 80.0f }, PlayerPosYString, olc::WHITE, { 2.0f, 2.0f });
+
+		//Payer walking bool
+		std::string PlayerWalkLeft = std::to_string(P.WalkingLeft);
+		std::string PlayerWalkRight = std::to_string(P.WalkingRight);
+
+		DrawStringDecal({ 10.0f, 140.0f }, "Right", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 100.0f, 140.0f }, PlayerWalkRight, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 120.0f }, "Left", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 100.0f, 120.0f }, PlayerWalkLeft, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles

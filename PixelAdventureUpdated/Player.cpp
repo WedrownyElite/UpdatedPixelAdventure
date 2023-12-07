@@ -12,32 +12,34 @@ olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed) {
 	}
 	if (pge->GetKey(olc::Key::A).bHeld || pge->GetKey(olc::Key::LEFT).bHeld) {
 		PlayerPos.x -= PlayerSpeed;
-		Player::Dir = false;
+		Dir = false;
 		WalkingLeft = true;
 		WalkingRight = false;
 	}
 	if (pge->GetKey(olc::Key::D).bHeld || pge->GetKey(olc::Key::RIGHT).bHeld) {
 		PlayerPos.x += PlayerSpeed;
-		Player::Dir = true;
+		Dir = true;
 		WalkingLeft = false;
 		WalkingRight = true;
 	}
-	else if ((!pge->GetKey(olc::Key::W).bHeld || !pge->GetKey(olc::Key::UP).bHeld)
-		|| (!pge->GetKey(olc::Key::S).bHeld || !pge->GetKey(olc::Key::DOWN).bHeld)
-		|| (!pge->GetKey(olc::Key::A).bHeld || !pge->GetKey(olc::Key::LEFT).bHeld)
-		|| (!pge->GetKey(olc::Key::D).bHeld || !pge->GetKey(olc::Key::RIGHT).bHeld)) {
+	if ((!pge->GetKey(olc::Key::W).bHeld || !pge->GetKey(olc::Key::UP).bHeld)
+		|| (!pge->GetKey(olc::Key::A).bHeld || !pge->GetKey(olc::Key::LEFT).bHeld)) {
 		WalkingLeft = false;
+	}
+	if ((!pge->GetKey(olc::Key::S).bHeld || !pge->GetKey(olc::Key::DOWN).bHeld)
+		|| (!pge->GetKey(olc::Key::D).bHeld || !pge->GetKey(olc::Key::RIGHT).bHeld)) {
 		WalkingRight = false;
 	}
+
 
 	return PlayerPos;
 }
 void Player::DrawPlayer(olc::TransformedView& tv) {
-	if (Player::Dir == false && WalkingLeft == false && WalkingRight == false) {
-		tv.DrawDecal(Player::PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
+	if (Dir == false && WalkingLeft == false && WalkingRight == false) {
+		tv.DrawDecal(PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
 	}
-	if (Player::Dir == true && WalkingLeft == false && WalkingRight == false) {
-		tv.DrawDecal(Player::PlayerPos, PlayerRightDecal, { 4.0f, 4.0f });
+	if (Dir == true && WalkingLeft == false && WalkingRight == false) {
+		tv.DrawDecal(PlayerPos, PlayerRightDecal, { 4.0f, 4.0f });
 	}
 	else {
 	}
