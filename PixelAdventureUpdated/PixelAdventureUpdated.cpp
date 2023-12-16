@@ -28,6 +28,7 @@ public:
 	std::vector<uint8_t> vWorldMap;
 
 	float PlayerSpeed;
+	olc::vf2d UpdatedPlayerPos;
 
 	olc::vf2d MousePos = { 300, 300 };
 
@@ -98,7 +99,8 @@ public:
 		//Update mouse pos (tv offset)
 		MousePos = MousePosFunc();
 		//Draw Player
-		P.DrawPlayer(tv);
+		P.DrawPlayer(tv, this, fElapsedTime);
+		tv.DrawRectDecal(PlayerPos, { 1.0f, 1.0f }, olc::WHITE);
 		//Draw debug variables
 		DebugVariables(PlayerPos);
 		return true;
