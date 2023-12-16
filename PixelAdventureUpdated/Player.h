@@ -6,8 +6,7 @@
 class Player {
 
 public:
-	bool WalkingLeft = false;
-	bool WalkingRight = false;
+	bool PlayerWalking = false;
 	olc::vf2d PlayerPos = { 300, 300 };
 	//False = left, True = right
 	bool Dir = false;
@@ -26,6 +25,7 @@ public:
 	olc::Decal* ShadowDecal;
 	olc::Decal* WalkLeftSSDecal;
 
+	bool MovingCheck(olc::PixelGameEngine* pge);
 	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed);
 	void DrawPlayer(olc::TransformedView& tv);
 	void Initialize(olc::PixelGameEngine* pge);

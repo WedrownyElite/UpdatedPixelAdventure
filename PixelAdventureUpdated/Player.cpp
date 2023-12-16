@@ -3,42 +3,50 @@
 
 olcPGEX_Animator2D animator;
 
+bool Player::MovingCheck(olc::PixelGameEngine* pge) {
+	if ((!pge->GetKey(olc::Key::D).bHeld || !pge->GetKey(olc::Key::LEFT).bHeld)
+		&& (!pge->GetKey(olc::Key::A).bHeld || !pge->GetKey(olc::Key::RIGHT).bHeld)
+		&& (!pge->GetKey(olc::Key::W).bHeld || !pge->GetKey(olc::Key::UP).bHeld)
+		&& (!pge->GetKey(olc::Key::S).bHeld || !pge->GetKey(olc::Key::DOWN).bHeld)) {
+		return false;
+	}
+	return true;
+}
 olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed) {
+	//Not moving
+	if (!MovingCheck(pge)) {
+		PlayerWalking = false;
+	}
+	//Walking up
 	if (pge->GetKey(olc::Key::W).bHeld || pge->GetKey(olc::Key::UP).bHeld) {
 		PlayerPos.y -= PlayerSpeed;
+		PlayerWalking = true;
 	}
+	//Walking down
 	if (pge->GetKey(olc::Key::S).bHeld || pge->GetKey(olc::Key::DOWN).bHeld) {
 		PlayerPos.y += PlayerSpeed;
+		PlayerWalking = true;
 	}
+	//Walking left
 	if (pge->GetKey(olc::Key::A).bHeld || pge->GetKey(olc::Key::LEFT).bHeld) {
 		PlayerPos.x -= PlayerSpeed;
 		Dir = false;
-		WalkingLeft = true;
-		WalkingRight = false;
+		PlayerWalking = true;
 	}
+	//Walking right
 	if (pge->GetKey(olc::Key::D).bHeld || pge->GetKey(olc::Key::RIGHT).bHeld) {
 		PlayerPos.x += PlayerSpeed;
 		Dir = true;
-		WalkingLeft = false;
-		WalkingRight = true;
+		PlayerWalking = true;
 	}
-	if ((!pge->GetKey(olc::Key::W).bHeld || !pge->GetKey(olc::Key::UP).bHeld)
-		|| (!pge->GetKey(olc::Key::A).bHeld || !pge->GetKey(olc::Key::LEFT).bHeld)) {
-		WalkingLeft = false;
-	}
-	if ((!pge->GetKey(olc::Key::S).bHeld || !pge->GetKey(olc::Key::DOWN).bHeld)
-		|| (!pge->GetKey(olc::Key::D).bHeld || !pge->GetKey(olc::Key::RIGHT).bHeld)) {
-		WalkingRight = false;
-	}
-
 
 	return PlayerPos;
 }
 void Player::DrawPlayer(olc::TransformedView& tv) {
-	if (Dir == false && WalkingLeft == false && WalkingRight == false) {
+	if (Dir == false && PlayerWalking == false) {
 		tv.DrawDecal(PlayerPos, PlayerLeftDecal, { 4.0f, 4.0f });
 	}
-	if (Dir == true && WalkingLeft == false && WalkingRight == false) {
+	if (Dir == true && PlayerWalking == false) {
 		tv.DrawDecal(PlayerPos, PlayerRightDecal, { 4.0f, 4.0f });
 	}
 	else {
