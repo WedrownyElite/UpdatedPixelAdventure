@@ -46,12 +46,12 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 	//Facing Left
 	if (Dir == false && PlayerWalking == false) {
 		animator.StopAll();
-		tv.DrawDecal({ PlayerPos.x - 2.0f, PlayerPos.y - 2.0f }, PlayerLeftDecal, { 4.0f, 4.0f });
+		tv.DrawDecal({ PlayerPos.x - 1.9f, PlayerPos.y - 2.0f }, PlayerLeftDecal, { 4.0f, 4.0f });
 	}
 	//Facing Right
 	if (Dir == true && PlayerWalking == false) {
 		animator.StopAll();
-		tv.DrawDecal({ PlayerPos.x - 2.0f, PlayerPos.y - 2.0f }, PlayerRightDecal, { 4.0f, 4.0f });
+		tv.DrawDecal({ PlayerPos.x - 1.80f, PlayerPos.y - 2.0f }, PlayerRightDecal, { 4.0f, 4.0f });
 	}
 	//Walking Left
 	if (Dir == false && PlayerWalking == true) {
@@ -69,7 +69,14 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 	}
 	if (PlayerWalking == true) {
 		animator.UpdateAnimations(fElapsedTime);
-		animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 2.0f, PlayerPos.y - 2.0f }));
+		//Right
+		if (Dir == true) {
+			animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 1.55f, PlayerPos.y - 2.0f }));
+		}
+		//Left
+		if (Dir == false) {
+			animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 1.9f, PlayerPos.y - 2.0f }));
+		}
 	}
 }
 

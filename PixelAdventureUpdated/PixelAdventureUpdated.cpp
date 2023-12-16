@@ -98,7 +98,10 @@ public:
 		MousePos = MousePosFunc();
 		//Draw Player
 		P.DrawPlayer(tv, this, fElapsedTime);
-		tv.DrawRectDecal(PlayerPos, { 1.0f, 1.0f }, olc::WHITE);
+		//Draw central player rectangle
+		tv.DrawRectDecal(PlayerPos, { 0.25f, 0.25f }, olc::WHITE);
+		//Draw player hitbox
+		tv.DrawRectDecal({ PlayerPos.x - 0.5f, PlayerPos.y - 1.0f}, { 1.0f, 2.0f }, olc::RED);
 		//Draw debug variables
 		DebugVariables(PlayerPos);
 		return true;
