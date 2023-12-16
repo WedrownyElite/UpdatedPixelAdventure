@@ -43,22 +43,29 @@ olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed) {
 	return PlayerPos;
 }
 void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime) {
-	//Facing left
+	//Facing Left
 	if (Dir == false && PlayerWalking == false) {
 		animator.StopAll();
 		tv.DrawDecal({ PlayerPos.x - 2.0f, PlayerPos.y - 2.0f }, PlayerLeftDecal, { 4.0f, 4.0f });
 	}
-	//Facing right
+	//Facing Right
 	if (Dir == true && PlayerWalking == false) {
 		animator.StopAll();
 		tv.DrawDecal({ PlayerPos.x - 2.0f, PlayerPos.y - 2.0f }, PlayerRightDecal, { 4.0f, 4.0f });
 	}
-	//Walking left
+	//Walking Left
 	if (Dir == false && PlayerWalking == true) {
 		if (!animator.GetAnim("Walk_Left")->bIsPlaying) {
 			animator.StopAll();
+			animator.Play("Walk_Left");
 		}
-		animator.Play("Walk_Left");
+	}
+	//Walking Right
+	if (Dir == true && PlayerWalking == true) {
+		if (!animator.GetAnim("Walk_Right")->bIsPlaying) {
+			animator.StopAll();
+			animator.Play("Walk_Right");
+		}
 	}
 	if (PlayerWalking == true) {
 		animator.UpdateAnimations(fElapsedTime);
@@ -73,14 +80,18 @@ void Player::Initialize(olc::PixelGameEngine* pge) {
 	PlayerDead = std::make_unique<olc::Sprite>("./Sprites/CharacterDeathPose.png");
 	Shadow = std::make_unique<olc::Sprite>("./Sprites/Shadow.png");
 	WalkLeftSS = std::make_unique<olc::Sprite>("./Sprites/CharacterLeftFacing-Sheet.png");
+	WalkRightSS = std::make_unique<olc::Sprite>("./Sprites/CharacterRightFacing-Sheet.png");
 	//Decals
 	PlayerRightDecal = new olc::Decal(PlayerRight.get());
 	PlayerLeftDecal = new olc::Decal(PlayerLeft.get());
 	PlayerDeadDecal = new olc::Decal(PlayerDead.get());
 	ShadowDecal = new olc::Decal(Shadow.get());
 	WalkLeftSSDecal = new olc::Decal(WalkLeftSS.get());
+	WalkRightSSDecal = new olc::Decal(WalkRightSS.get());
 
 	//Animations
-	animator.AddAnimation("Walk_Left", 0.25f, 6, WalkLeftSSDecal, { 0.0f, 0.0f }, { 32, 32 }, { 0.0f, 0.0f });
+	animator.AddAnimation("Walk_Right", 0.5f, 6, WalkRightSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
+	animator.ScaleAnimation("Walk_Right", { 4.0f, 4.0f });
+	animator.AddAnimation("Walk_Left", 0.5f, 6, WalkLeftSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
 	animator.ScaleAnimation("Walk_Left", { 4.0f, 4.0f });
 }

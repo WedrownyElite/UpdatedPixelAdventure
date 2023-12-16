@@ -17,6 +17,7 @@ public:
 	std::unique_ptr<olc::Sprite> PlayerDead;
 	std::unique_ptr<olc::Sprite> Shadow;
 	std::unique_ptr<olc::Sprite> WalkLeftSS;
+	std::unique_ptr<olc::Sprite> WalkRightSS;
 
 	//Decals
 	olc::Decal* PlayerRightDecal;
@@ -24,6 +25,7 @@ public:
 	olc::Decal* PlayerDeadDecal;
 	olc::Decal* ShadowDecal;
 	olc::Decal* WalkLeftSSDecal;
+	olc::Decal* WalkRightSSDecal;
 
 	bool MovingCheck(olc::PixelGameEngine* pge);
 	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed);
