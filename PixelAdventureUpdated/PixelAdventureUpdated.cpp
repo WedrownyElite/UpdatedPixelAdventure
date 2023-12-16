@@ -9,9 +9,7 @@
 #include <iostream>
 
 #include "Player.h"
-#include "GlobalVars.h"
 Player P;
-GlobalVars GV;
 
 class Pixel_Adventure : public olc::PixelGameEngine {
 public:
@@ -128,7 +126,6 @@ private:
 		vWorldMap.resize(m_vWorldSize.x * m_vWorldSize.y);
 		for (int i = 0; i < vWorldMap.size(); i++)
 			vWorldMap[i] = ((rand() % 20) == 1) ? 1 : 0;
-
 		P.Initialize(this);
 		return true;
 	}

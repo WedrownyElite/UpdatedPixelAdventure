@@ -131,14 +131,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="GLobalVars.cpp" />
-    <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="PixelAdventureUpdated.cpp" />
     <ClCompile Include="Player.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GlobalVars.h" />
-    <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="olcPGEX_Animator2D.h" />
     <ClInclude Include="olcPGEX_TransformedView.h" />
     <ClInclude Include="olcPixelGameEngine.h" />

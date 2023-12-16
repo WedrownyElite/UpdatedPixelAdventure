@@ -1,9 +1,7 @@
 #include "Player.h"
 #include "olcPGEX_Animator2D.h"
-#include "MathFunctions.h"
 
 olcPGEX_Animator2D animator;
-MathFunctions MF;
 
 bool Player::MovingCheck(olc::PixelGameEngine* pge) {
 	if ((!pge->GetKey(olc::Key::D).bHeld || !pge->GetKey(olc::Key::LEFT).bHeld)
@@ -48,7 +46,7 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 	//Facing left
 	if (Dir == false && PlayerWalking == false) {
 		animator.StopAll();
-		tv.DrawDecal({PlayerPos.x - 2.0f, PlayerPos.y - 2.0f }, PlayerLeftDecal, {4.0f, 4.0f});
+		tv.DrawDecal({ PlayerPos.x - 2.0f, PlayerPos.y - 2.0f }, PlayerLeftDecal, { 4.0f, 4.0f });
 	}
 	//Facing right
 	if (Dir == true && PlayerWalking == false) {
@@ -63,12 +61,11 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 		animator.Play("Walk_Left");
 	}
 	if (PlayerWalking == true) {
-		UpdatedPlayerPos = MF.GetPlayerPos(tv, pge, PlayerPos);
 		animator.UpdateAnimations(fElapsedTime);
-		animator.DrawAnimationFrame({PlayerPos.x + 420.0f - tv.GetWorldOffset().x,
-									 PlayerPos.y + 215.0f - tv.GetWorldOffset().y});
+		animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 2.0f, PlayerPos.y - 2.0f }));
 	}
 }
+
 void Player::Initialize(olc::PixelGameEngine* pge) {
 	//Sprites
 	PlayerRight = std::make_unique<olc::Sprite>("./Sprites/CharacterRightFacing.png");
@@ -84,6 +81,6 @@ void Player::Initialize(olc::PixelGameEngine* pge) {
 	WalkLeftSSDecal = new olc::Decal(WalkLeftSS.get());
 
 	//Animations
-	animator.AddAnimation("Walk_Left", 1.0f, 6, WalkLeftSSDecal, { 0.0f, 0.0f }, { 32, 32 }, { 0.0f, 0.0f });
+	animator.AddAnimation("Walk_Left", 0.25f, 6, WalkLeftSSDecal, { 0.0f, 0.0f }, { 32, 32 }, { 0.0f, 0.0f });
 	animator.ScaleAnimation("Walk_Left", { 4.0f, 4.0f });
 }
