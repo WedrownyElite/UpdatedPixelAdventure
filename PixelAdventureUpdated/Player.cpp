@@ -3,6 +3,25 @@
 
 olcPGEX_Animator2D animator;
 
+bool Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool PlayerAttacked) {
+	//Attack input
+	if (CanAttack == true && pge->GetMouse(0).bPressed) {
+		CanAttack = false;
+		PlayerAttacked = true;
+	}
+	//Attack cooldown
+	if (CanAttack == false) {
+		if (AttackCooldown < 1.0f) {
+			AttackCooldown += fElapsedTime;
+		}
+		if (AttackCooldown >= 1.0f) {
+			AttackCooldown = 0.0f;
+			CanAttack = true;
+		}
+	}
+
+	return PlayerAttacked;
+}
 bool Player::MovingCheck(olc::PixelGameEngine* pge) {
 	if ((!pge->GetKey(olc::Key::D).bHeld || !pge->GetKey(olc::Key::LEFT).bHeld)
 		&& (!pge->GetKey(olc::Key::A).bHeld || !pge->GetKey(olc::Key::RIGHT).bHeld)

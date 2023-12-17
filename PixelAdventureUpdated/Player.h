@@ -7,6 +7,8 @@ class Player {
 public:
 	olc::vf2d UpdatedPlayerPos;
 	bool PlayerWalking = false;
+	bool CanAttack = true;
+	float AttackCooldown = 0.0f;
 	olc::vf2d PlayerPos = { 300, 300 };
 	//False = left, True = right
 	bool Dir = false;
@@ -27,6 +29,7 @@ public:
 	olc::Decal* WalkLeftSSDecal;
 	olc::Decal* WalkRightSSDecal;
 
+	bool AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool PlayerAttacked);
 	bool MovingCheck(olc::PixelGameEngine* pge);
 	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed);
 	void DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime);

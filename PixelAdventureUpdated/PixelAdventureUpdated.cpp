@@ -26,7 +26,7 @@ public:
 	std::vector<uint8_t> vWorldMap;
 
 	float PlayerSpeed;
-	olc::vf2d UpdatedPlayerPos;
+	bool PlayerAttacked = false;
 
 	olc::vf2d MousePos = { 300, 300 };
 
@@ -92,6 +92,7 @@ public:
 
 		//Player input
 		PlayerPos = P.PlayerInput(this, PlayerSpeed);
+		PlayerAttacked = P.AttackInput(this, fElapsedTime, PlayerAttacked);
 		//Draw background
 		DrawBGCamera();
 		//Update mouse pos (tv offset)
