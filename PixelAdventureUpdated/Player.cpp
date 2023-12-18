@@ -99,7 +99,7 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 	}
 }
 
-void Player::Initialize(olc::PixelGameEngine* pge) {
+void Player::Initialize() {
 	//Sprites
 	PlayerRight = std::make_unique<olc::Sprite>("./Sprites/CharacterRightFacing.png");
 	PlayerLeft = std::make_unique<olc::Sprite>("./Sprites/CharacterLeftFacing.png");

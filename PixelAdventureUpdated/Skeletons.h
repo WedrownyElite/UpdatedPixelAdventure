@@ -15,6 +15,14 @@ private:
 	olc::Decal* SkeleRightDecal;
 	olc::Decal* SkeleRightHurtDecal;
 	olc::Decal* ShadowDecal;
-public:
 
+	std::vector<olc::vf2d> SkelePos;
+	std::vector<int> SkeleBelow;
+	std::vector<int> SkeleAbove;
+public:
+	void SpawnSkeleton();
+	void DrawCalculation(olc::vf2d PlayerPos);
+	void DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge);
+	void DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge);
+	void Initialize();
 };

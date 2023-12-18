@@ -9,6 +9,9 @@
 #include <iostream>
 
 #include "Player.h"
+#include "Skeletons.h"
+
+Skeleton Skele;
 Player P;
 
 class Pixel_Adventure : public olc::PixelGameEngine {
@@ -97,8 +100,12 @@ public:
 		DrawBGCamera();
 		//Update mouse pos (tv offset)
 		MousePos = MousePosFunc();
+		//Draw skeletons below player
+		Skele.DrawBelowPlayer(tv, this);
 		//Draw Player
 		P.DrawPlayer(tv, this, fElapsedTime);
+		//Draw skeletons above player
+		Skele.DrawAbovePlayer(tv, this);
 		//Draw central player rectangle
 		tv.DrawRectDecal(PlayerPos, { 0.25f, 0.25f }, olc::WHITE);
 		//Draw player hitbox
@@ -130,7 +137,10 @@ private:
 		vWorldMap.resize(m_vWorldSize.x * m_vWorldSize.y);
 		for (int i = 0; i < vWorldMap.size(); i++)
 			vWorldMap[i] = ((rand() % 20) == 1) ? 1 : 0;
-		P.Initialize(this);
+
+		//Initialize needed files
+		Skele.Initialize();
+		P.Initialize();
 		return true;
 	}
 };

@@ -33,6 +33,6 @@ public:
 	bool MovingCheck(olc::PixelGameEngine* pge);
 	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed);
 	void DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime);
-	void Initialize(olc::PixelGameEngine* pge);
+	void Initialize();
 
 };
