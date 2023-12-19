@@ -2,8 +2,6 @@
 #include "olcPixelGameEngine.h"
 #include "olcPGEX_TransformedView.h"
 
-#include "MathFunctions.h"
-
 class Skeleton {
 private:
 	//Sprites
@@ -19,7 +17,9 @@ private:
 	std::vector<olc::vf2d> SkelePos;
 	std::vector<int> SkeleBelow;
 	std::vector<int> SkeleAbove;
+	std::vector<int> SkeleHit;
 public:
+	bool IsHit(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, bool PlayerAttacked, olc::vf2d PlayeroPos);
 	olc::vf2d Collision(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed);
 	void SpawnSkeleton();
 	void DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed);

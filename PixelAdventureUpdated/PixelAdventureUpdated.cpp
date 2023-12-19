@@ -69,6 +69,12 @@ public:
 
 		DrawStringDecal({ 10.0f, 80.0f }, "FPS:", olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 80.0f, 80.0f }, FPSString, olc::WHITE, { 2.0f, 2.0f });
+
+		//PlayerAttacked
+		std::string PlayerAttackedString = std::to_string(PlayerAttacked);
+
+		DrawStringDecal({ 10.0f, 120.0f }, "PlayerAttacked", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 250.0f, 120.0f }, PlayerAttackedString, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles
@@ -101,6 +107,7 @@ public:
 		//Draw background
 		DrawBGCamera();
 		//Enemy functions
+		PlayerAttacked = Skele.IsHit(this, tv, PlayerAttacked, PlayerPos);
 		Skele.SpawnSkeleton();
 		Skele.DrawCalculation(this, PlayerPos, PlayerSpeed);
 		//Update mouse pos (tv offset)

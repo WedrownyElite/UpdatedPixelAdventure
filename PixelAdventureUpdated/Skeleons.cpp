@@ -1,6 +1,31 @@
 #include "Skeletons.h"
 
-olc::vf2d Skeleton::Collision(olc::PixelGameEngine * pge, olc::vf2d PlayerPos, float PlayerSpeed) {
+#include "MathFunctions.h"
+#include "GlobalVariables.h"
+
+MathFunctions MF;
+
+bool Skeleton::IsHit(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, bool PlayerAttacked, olc::vf2d PlayerPos) {
+	if (PlayerAttacked == true) {
+		for (int k = 0; k < SkelePos.size(); k++) {
+			olc::vf2d MousePos = { MF.GetWorldMousePos(tv, pge) };
+			olc::vf2d PlayerDir = (-(PlayerPos - MousePos).norm());
+			float angleTowards = MF.PointTo(PlayerPos, SkelePos[k]);
+			float angleDiff = MF.angleDifference(PlayerDir.polar().y, angleTowards);
+			if (
+				(sqrt(pow(PlayerPos.x - SkelePos[k].x, 2) + pow(PlayerPos.y - SkelePos[k].y, 2)) < GlobalVars::maxDistance //Check to see if the target is in range (distance formula)
+					&& abs(angleDiff) < GlobalVars::maxAngle)  //See if the target's angle is within the sweeping arc range.
+				) {
+				SkeleHit[k] = 1;
+			}
+			else {
+				PlayerAttacked = false;
+			}
+		}
+	}
+	return PlayerAttacked;
+}
+olc::vf2d Skeleton::Collision(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed) {
 	for (int k = 0; k < SkelePos.size(); k++) {
 		olc::vf2d Skele(SkelePos[k].x - 0.5f, SkelePos[k].y - 1.0f);
 		olc::vf2d UPlayerPos(PlayerPos.x - 0.5f, PlayerPos.y - 1.0f);
@@ -21,6 +46,7 @@ olc::vf2d Skeleton::Collision(olc::PixelGameEngine * pge, olc::vf2d PlayerPos, f
 }
 void Skeleton::SpawnSkeleton() {
 	if (SkelePos.size() < 1) {
+		SkeleHit.push_back(0);
 		SkelePos.push_back({ 305.0f, 305.0f });
 	}
 }

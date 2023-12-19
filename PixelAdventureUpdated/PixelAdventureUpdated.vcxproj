@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EnemyFunctions.cpp" />
     <ClCompile Include="GlobalVariables.cpp" />
     <ClCompile Include="MathFunctions.cpp" />
     <ClCompile Include="PixelAdventureUpdated.cpp" />
@@ -138,6 +139,7 @@
     <ClCompile Include="Skeleons.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EnemyFunctions.h" />
     <ClInclude Include="GlobalVariables.h" />
     <ClInclude Include="MathFunctions.h" />
     <ClInclude Include="olcPGEX_Animator2D.h" />
