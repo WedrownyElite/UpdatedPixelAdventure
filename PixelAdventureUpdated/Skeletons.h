@@ -20,8 +20,9 @@ private:
 	std::vector<int> SkeleBelow;
 	std::vector<int> SkeleAbove;
 public:
+	olc::vf2d Collision(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed);
 	void SpawnSkeleton();
-	void DrawCalculation(olc::vf2d PlayerPos);
+	void DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed);
 	void DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge);
 	void DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge);
 	void Initialize();

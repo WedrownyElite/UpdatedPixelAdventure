@@ -5,6 +5,7 @@
 class Player {
 
 public:
+	olc::vf2d MovementDirection;
 	olc::vf2d UpdatedPlayerPos;
 	bool PlayerWalking = false;
 	bool CanAttack = true;

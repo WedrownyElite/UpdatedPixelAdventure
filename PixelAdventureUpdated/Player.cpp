@@ -32,33 +32,37 @@ bool Player::MovingCheck(olc::PixelGameEngine* pge) {
 	return true;
 }
 olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed) {
+	MovementDirection = { 0, 0 };
 	//Not moving
 	if (!MovingCheck(pge)) {
 		PlayerWalking = false;
 	}
 	//Walking up
 	if (pge->GetKey(olc::Key::W).bHeld || pge->GetKey(olc::Key::UP).bHeld) {
-		PlayerPos.y -= PlayerSpeed;
+		MovementDirection.y = -1;
 		PlayerWalking = true;
 	}
 	//Walking down
 	if (pge->GetKey(olc::Key::S).bHeld || pge->GetKey(olc::Key::DOWN).bHeld) {
-		PlayerPos.y += PlayerSpeed;
+		MovementDirection.y = 1;
 		PlayerWalking = true;
 	}
 	//Walking left
 	if (pge->GetKey(olc::Key::A).bHeld || pge->GetKey(olc::Key::LEFT).bHeld) {
-		PlayerPos.x -= PlayerSpeed;
+		MovementDirection.x = -1;
 		Dir = false;
 		PlayerWalking = true;
 	}
 	//Walking right
 	if (pge->GetKey(olc::Key::D).bHeld || pge->GetKey(olc::Key::RIGHT).bHeld) {
-		PlayerPos.x += PlayerSpeed;
+		MovementDirection.x = 1;
 		Dir = true;
 		PlayerWalking = true;
 	}
-
+	if (PlayerWalking == true) {
+		MovementDirection = MovementDirection.norm();
+	}
+	PlayerPos += PlayerSpeed * MovementDirection;
 	return PlayerPos;
 }
 void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime) {
@@ -100,6 +104,7 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 }
 
 void Player::Initialize() {
+	MovementDirection = { 0, 0 };
 	//Sprites
 	PlayerRight = std::make_unique<olc::Sprite>("./Sprites/CharacterRightFacing.png");
 	PlayerLeft = std::make_unique<olc::Sprite>("./Sprites/CharacterLeftFacing.png");

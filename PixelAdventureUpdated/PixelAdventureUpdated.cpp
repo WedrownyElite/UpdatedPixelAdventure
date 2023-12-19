@@ -16,7 +16,7 @@ Player P;
 
 class Pixel_Adventure : public olc::PixelGameEngine {
 public:
-
+	bool DebugScreen = false;
 	//Camera variables
 	// Transformed view object to make world offsetting simple
 	olc::TileTransformedView tv;
@@ -52,21 +52,23 @@ public:
 		std::string MousePosXString = std::to_string(MousePos.x);
 		std::string MousePosYString = std::to_string(MousePos.y);
 
-		DrawStringDecal({ 10.0f, 10.0f }, MousePosXString, olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 250.0f, 10.0f }, MousePosYString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 10.0f }, "MousePos:", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 170.0f, 10.0f }, MousePosXString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 350.0f, 10.0f }, MousePosYString, olc::WHITE, { 2.0f, 2.0f });
 
 		//PlayerPos
 		std::string PlayerPosXString = std::to_string(PlayerPos.x);
 		std::string PlayerPosYString = std::to_string(PlayerPos.y);
 
-		DrawStringDecal({ 10.0f, 80.0f }, PlayerPosXString, olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 250.0f, 80.0f }, PlayerPosYString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 40.0f }, "PlayerPos:", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 170.0f, 40.0f }, PlayerPosXString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 350.0f, 40.0f }, PlayerPosYString, olc::WHITE, { 2.0f, 2.0f });
 
-		//Payer walking bool
-		std::string PlayerWalking = std::to_string(P.PlayerWalking);
+		//FPS
+		std::string FPSString = std::to_string(GetFPS());
 
-		DrawStringDecal({ 10.0f, 140.0f }, "Right", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 100.0f, 140.0f }, PlayerWalking, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 80.0f }, "FPS:", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 80.0f, 80.0f }, FPSString, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles
@@ -98,6 +100,9 @@ public:
 		PlayerAttacked = P.AttackInput(this, fElapsedTime, PlayerAttacked);
 		//Draw background
 		DrawBGCamera();
+		//Enemy functions
+		Skele.SpawnSkeleton();
+		Skele.DrawCalculation(this, PlayerPos, PlayerSpeed);
 		//Update mouse pos (tv offset)
 		MousePos = MousePosFunc();
 		//Draw skeletons below player
@@ -111,7 +116,18 @@ public:
 		//Draw player hitbox
 		tv.DrawRectDecal({ PlayerPos.x - 0.5f, PlayerPos.y - 1.0f}, { 1.0f, 2.0f }, olc::RED);
 		//Draw debug variables
-		DebugVariables(PlayerPos);
+		if (DebugScreen == true) {
+			DebugVariables(PlayerPos);
+		}
+
+		//General inputs
+		//Escape (EXIT)
+		if (GetKey(olc::Key::ESCAPE).bPressed) {
+			return false;
+		}
+		//Toggle DebugScreen
+		if (GetKey(olc::Key::F1).bPressed) DebugScreen = !DebugScreen;
+
 		return true;
 	}
 private:
