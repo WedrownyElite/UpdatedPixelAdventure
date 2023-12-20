@@ -4,5 +4,5 @@
 
 class EnemyFunctions {
 public:
-	void HitKnockback(olc::PixelGameEngine* pge, std::vector<int> IsHit, std::vector<olc::vf2d> EnemyPos, olc::vf2d PlayerPos);
+	olc::vf2d HitKnockback(olc::PixelGameEngine* pge, int IsHit, olc::vf2d EnemyPos, olc::vf2d PlayerPos);
 };
