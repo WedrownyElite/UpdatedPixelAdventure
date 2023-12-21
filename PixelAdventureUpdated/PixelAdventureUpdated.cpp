@@ -11,7 +11,7 @@
 #include "Player.h"
 #include "Skeletons.h"
 
-Skeleton Skele;
+SkeletonFunctions SkeleFunctions;
 Player P;
 
 class Pixel_Adventure : public olc::PixelGameEngine {
@@ -30,6 +30,7 @@ public:
 
 	float PlayerSpeed;
 	bool PlayerAttacked = false;
+	std::vector<Skeletons> Skeles;
 
 	olc::vf2d MousePos = { 300, 300 };
 
@@ -107,17 +108,17 @@ public:
 		//Draw background
 		DrawBGCamera();
 		//Enemy functions
-		PlayerAttacked = Skele.IsHit(this, tv, PlayerAttacked, PlayerPos);
-		Skele.SpawnSkeleton();
-		Skele.DrawCalculation(this, PlayerPos, PlayerSpeed);
+		SkeleFunctions.IsHit(this, tv, Skeles, PlayerAttacked, PlayerPos);
+		SkeleFunctions.SpawnSkeleton(Skeles);
+		SkeleFunctions.DrawCalculation(this, PlayerPos, PlayerSpeed, Skeles);
 		//Update mouse pos (tv offset)
 		MousePos = MousePosFunc();
 		//Draw skeletons below player
-		Skele.DrawBelowPlayer(tv, this);
+		SkeleFunctions.DrawBelowPlayer(tv, this, Skeles);
 		//Draw Player
 		P.DrawPlayer(tv, this, fElapsedTime);
 		//Draw skeletons above player
-		Skele.DrawAbovePlayer(tv, this);
+		SkeleFunctions.DrawAbovePlayer(tv, this, Skeles);
 		//Draw central player rectangle
 		tv.DrawRectDecal(PlayerPos, { 0.25f, 0.25f }, olc::WHITE);
 		//Draw player hitbox
@@ -162,7 +163,7 @@ private:
 			vWorldMap[i] = ((rand() % 20) == 1) ? 1 : 0;
 
 		//Initialize needed files
-		Skele.Initialize();
+		SkeleFunctions.Initialize();
 		P.Initialize();
 		return true;
 	}

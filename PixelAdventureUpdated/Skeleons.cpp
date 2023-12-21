@@ -4,30 +4,30 @@
 #include "GlobalVariables.h"
 
 MathFunctions MF;
+Skeletons Skele;
 
-bool Skeleton::IsHit(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, bool PlayerAttacked, olc::vf2d PlayerPos) {
+void SkeletonFunctions::IsHit(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, std::vector<Skeletons>& Skeles, bool& PlayerAttacked, olc::vf2d PlayerPos) {
 	if (PlayerAttacked == true) {
-		for (int k = 0; k < SkelePos.size(); k++) {
+		for (int k = 0; k < Skeles.size(); k++) {
 			olc::vf2d MousePos = { MF.GetWorldMousePos(tv, pge) };
 			olc::vf2d PlayerDir = (-(PlayerPos - MousePos).norm());
-			float angleTowards = MF.PointTo(PlayerPos, SkelePos[k]);
+			float angleTowards = MF.PointTo(PlayerPos, Skeles[k].SkelePos);
 			float angleDiff = MF.angleDifference(PlayerDir.polar().y, angleTowards);
 			if (
-				(sqrt(pow(PlayerPos.x - SkelePos[k].x, 2) + pow(PlayerPos.y - SkelePos[k].y, 2)) < GlobalVars::maxDistance //Check to see if the target is in range (distance formula)
+				(sqrt(pow(PlayerPos.x - Skeles[k].SkelePos.x, 2) + pow(PlayerPos.y - Skeles[k].SkelePos.y, 2)) < GlobalVars::maxDistance //Check to see if the target is in range (distance formula)
 					&& abs(angleDiff) < GlobalVars::maxAngle)  //See if the target's angle is within the sweeping arc range.
 				) {
-				SkeleHit[k] = 1;
+				Skeles[k].SkeleHit = 1;
 			}
 			else {
 				PlayerAttacked = false;
 			}
 		}
 	}
-	return PlayerAttacked;
 }
-olc::vf2d Skeleton::Collision(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed) {
-	for (int k = 0; k < SkelePos.size(); k++) {
-		olc::vf2d Skele(SkelePos[k].x - 0.5f, SkelePos[k].y - 1.0f);
+void SkeletonFunctions::Collision(olc::PixelGameEngine* pge, std::vector<Skeletons>& Skeles, olc::vf2d PlayerPos, float PlayerSpeed) {
+	for (int k = 0; k < Skeles.size(); k++) {
+		olc::vf2d Skele(Skeles[k].SkelePos.x - 0.5f, Skeles[k].SkelePos.y - 1.0f);
 		olc::vf2d UPlayerPos(PlayerPos.x - 0.5f, PlayerPos.y - 1.0f);
 		olc::vf2d PlayerSize(0.7f, 1.2f);
 		olc::vf2d SkeleSize(0.8f, 1.2f);
@@ -38,53 +38,55 @@ olc::vf2d Skeleton::Collision(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, fl
 			&& Skele.y < UPlayerPos.y + PlayerSize.y
 			&& Skele.y + SkeleSize.y > UPlayerPos.y) {
 			//Direction of player
-			olc::vf2d dir = (PlayerPos - SkelePos[k]).norm();
-			SkelePos[k] += -dir * PlayerSpeed;
+			olc::vf2d dir = (PlayerPos - Skeles[k].SkelePos).norm();
+			Skeles[k].SkelePos += -dir * PlayerSpeed;
 		}
-		return SkelePos[k];
 	}
 }
-void Skeleton::SpawnSkeleton() {
-	if (SkelePos.size() < 1) {
-		SkeleHit.push_back(0);
-		SkelePos.push_back({ 305.0f, 305.0f });
+void SkeletonFunctions::SpawnSkeleton(std::vector<Skeletons>& Skeles) {
+	for (int k = 0; (k < 1) && (k <= Skeles.size()); k++) {
+		Skeletons skeleton;
+
+		skeleton.SkelePos = { 305.0f, 305.0f };
+		skeleton.SkeleHit = 0;
+		Skeles.push_back(skeleton);
 	}
 }
-void Skeleton::DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed) {
+void SkeletonFunctions::DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed, std::vector<Skeletons> Skeles) {
 	SkeleAbove.clear();
 	SkeleBelow.clear();
-	for (int i = 0; i < SkelePos.size(); i++) {
-		SkelePos[i] = Collision(pge, PlayerPos, PlayerSpeed);
+	for (int i = 0; i < Skeles.size(); i++) {
+		Collision(pge, Skeles, PlayerPos, PlayerSpeed);
 		//If Skele y is greater than Player y
-		if (SkelePos[i].y < PlayerPos.y) {
+		if (Skeles[i].SkelePos.y < PlayerPos.y) {
 			SkeleBelow.push_back(i);
 		}
-		if (SkelePos[i].y >= PlayerPos.y) {
+		if (Skeles[i].SkelePos.y >= PlayerPos.y) {
 			SkeleAbove.push_back(i);
 		}
 	}
 }
-void Skeleton::DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge) {
+void SkeletonFunctions::DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles) {
 	for (int k = 0; k < SkeleBelow.size(); k++) {
 		int i = SkeleBelow[k];
-		tv.DrawDecal({ SkelePos[i].x - 1.0f, SkelePos[i].y - 1.0f }, SkeleRightDecal, {2.0f, 2.0f});
+		tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightDecal, {2.0f, 2.0f});
 		//Draw central skele rectangle
-		tv.DrawRectDecal(SkelePos[i], { 0.25f, 0.25f }, olc::RED);
+		tv.DrawRectDecal(Skeles[i].SkelePos, { 0.25f, 0.25f }, olc::RED);
 		//Draw skele hitbox
-		tv.DrawRectDecal({ SkelePos[i].x - 0.5f, SkelePos[i].y - 1.0f }, { 1.2f, 2.0f }, olc::RED);
+		tv.DrawRectDecal({ Skeles[i].SkelePos.x - 0.5f, Skeles[i].SkelePos.y - 1.0f }, { 1.2f, 2.0f }, olc::RED);
 	}
 }
-void Skeleton::DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge) {
+void SkeletonFunctions::DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles) {
 	for (int k = 0; k < SkeleAbove.size(); k++) {
 		int i = SkeleAbove[k];
-		tv.DrawDecal({ SkelePos[i].x - 1.0f, SkelePos[i].y - 1.0f }, SkeleRightDecal, {2.0f, 2.0f});
+		tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightDecal, {2.0f, 2.0f});
 		//Draw central skele rectangle
-		tv.DrawRectDecal(SkelePos[i], { 0.25f, 0.25f }, olc::RED);
+		tv.DrawRectDecal(Skeles[i].SkelePos, { 0.25f, 0.25f }, olc::RED);
 		//Draw skele hitbox
-		tv.DrawRectDecal({ SkelePos[i].x - 0.5f, SkelePos[i].y - 1.0f }, { 1.2f, 2.0f }, olc::RED);
+		tv.DrawRectDecal({ Skeles[i].SkelePos.x - 0.5f, Skeles[i].SkelePos.y - 1.0f }, { 1.2f, 2.0f }, olc::RED);
 	}
 }
-void Skeleton::Initialize() {
+void SkeletonFunctions::Initialize() {
 	//Sprites
 	SkeleRight = std::make_unique<olc::Sprite>("./Sprites/SkeletonRight.png");
 	SkeleRightHurt = std::make_unique<olc::Sprite>("./Sprites/SkeletonRightHurt.png");
