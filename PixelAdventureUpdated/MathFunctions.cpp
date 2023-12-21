@@ -1,5 +1,13 @@
 #include "MathFunctions.h"
 
+float MathFunctions::GetDistance(olc::vf2d EnemyPos, olc::vf2d PlayerPos) {
+	float dx = EnemyPos.x - PlayerPos.x;
+	float dy = EnemyPos.y - PlayerPos.y;
+
+	float dis = (dx * dx + dy * dy);
+
+	return dis;
+}
 float MathFunctions::angleDifference(float angle_1, float angle_2) {
 	angle_1 = fmod(angle_1, 2 * 3.14159f);
 	angle_2 = fmod(angle_2, 2 * 3.14159f);

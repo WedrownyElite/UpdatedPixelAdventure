@@ -6,6 +6,9 @@ class Skeletons {
 public:
 	olc::vf2d SkelePos;
 	int SkeleHit;
+	int RedSkele;
+	int RedSkeleTimer;
+	float KnockbackDist;
 };
 class SkeletonFunctions {
 private:
@@ -23,6 +26,7 @@ private:
 	std::vector<int> SkeleAbove;
 public:
 	void IsHit(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, std::vector<Skeletons>& Skeles, bool& PlayerAttacked, olc::vf2d PlayeroPos);
+	void Knockback(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, std::vector<Skeletons>& Skeles);
 	void Collision(olc::PixelGameEngine* pge, std::vector<Skeletons>& Skeles, olc::vf2d PlayerPos, float PlayerSpeed);
 	void SpawnSkeleton(std::vector<Skeletons>& Skeles);
 	void DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed, std::vector<Skeletons> Skeles);

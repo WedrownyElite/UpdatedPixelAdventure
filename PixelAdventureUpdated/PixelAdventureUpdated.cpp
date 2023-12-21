@@ -108,7 +108,10 @@ public:
 		//Draw background
 		DrawBGCamera();
 		//Enemy functions
-		SkeleFunctions.IsHit(this, tv, Skeles, PlayerAttacked, PlayerPos);
+		SkeleFunctions.Collision(this, Skeles, PlayerPos, PlayerSpeed);
+		if (PlayerAttacked == true) {
+			SkeleFunctions.IsHit(this, tv, Skeles, PlayerAttacked, PlayerPos);
+		}
 		SkeleFunctions.SpawnSkeleton(Skeles);
 		SkeleFunctions.DrawCalculation(this, PlayerPos, PlayerSpeed, Skeles);
 		//Update mouse pos (tv offset)
