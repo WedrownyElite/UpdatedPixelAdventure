@@ -10,7 +10,10 @@
 
 #include "Player.h"
 #include "Skeletons.h"
+#include "MathFunctions.h"
+#include "GlobalVariables.h"
 
+MathFunctions MathFuncs;
 SkeletonFunctions SkeleFunctions;
 Player P;
 
@@ -28,6 +31,7 @@ public:
 	// The world map, stored as a 1D array
 	std::vector<uint8_t> vWorldMap;
 
+	float KnockbackSpeed;
 	float PlayerSpeed;
 	bool PlayerAttacked = false;
 	std::vector<Skeletons> Skeles;
@@ -44,10 +48,6 @@ public:
 		sAppName = "Pixel Adventure";
 	}
 
-	olc::vf2d MousePosFunc() {
-		MousePos = GetMousePos() / 32 + tv.GetWorldOffset();
-		return MousePos;
-	}
 	void DebugVariables(olc::vf2d PlayerPos) {
 		//MousePos (tv offset)
 		std::string MousePosXString = std::to_string(MousePos.x);
@@ -76,6 +76,52 @@ public:
 
 		DrawStringDecal({ 10.0f, 120.0f }, "PlayerAttacked", olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 250.0f, 120.0f }, PlayerAttackedString, olc::WHITE, { 2.0f, 2.0f });
+
+		//Player dir
+		olc::vf2d PlayerDir = (-(PlayerPos - MousePos).norm());
+		std::string PlayerDirX = std::to_string(PlayerDir.x);
+		std::string PlayerDirY = std::to_string(PlayerDir.y);
+		DrawStringDecal({ 10.0f, 140.0f }, "PlayerDir:", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 180.0f, 140.0f }, PlayerDirX, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 350.0f, 140.0f }, PlayerDirY, olc::WHITE, { 2.0f, 2.0f });
+
+		//Angle towards
+		float angleTowards = MathFuncs.PointTo(PlayerPos, Skeles[0].SkelePos);
+		std::string angleTowardsString = std::to_string(angleTowards);
+
+		DrawStringDecal({ 10.0f, 160.0f }, "AngleTowards:", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 220.0f, 160.0f }, angleTowardsString, olc::WHITE, { 2.0f, 2.0f });
+
+		//AngleDiff
+		float angleDiff = MathFuncs.angleDifference(PlayerDir.polar().y, angleTowards);
+		std::string angleDiffString = std::to_string(angleDiff);
+
+		DrawStringDecal({ 10.0f, 180.0f }, "AngleDiff:", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 180.0f, 180.0f }, angleDiffString, olc::WHITE, { 2.0f, 2.0f });
+
+		//Direction
+		olc::vf2d dir = (PlayerPos - Skeles[0].SkelePos).norm();
+		std::string dirX = std::to_string(dir.x);
+		std::string dirY = std::to_string(dir.y);
+
+		DrawStringDecal({ 10.0f, 200.0f }, "Direction:", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 170.0f, 200.0f }, dirX, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 320.0f, 200.0f }, dirY, olc::WHITE, { 2.0f, 2.0f });
+
+		//Distance
+		float dist = sqrt(pow(PlayerPos.x - Skeles[0].SkelePos.x, 2) + pow(PlayerPos.y - Skeles[0].SkelePos.y, 2));
+		std::string distString = std::to_string(dist);
+		DrawStringDecal({ 10.0f, 220.0f }, "Less than 2.0f?", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 280.0f, 220.0f }, distString, olc::WHITE, { 2.0f, 2.0f });
+
+		//Angle
+		float Angle = abs(angleDiff);
+		std::string AngleString = std::to_string(Angle);
+		std::string MaxAngleString = std::to_string(GlobalVars::maxAngle);
+		
+		DrawStringDecal({ 10.0f, 240.0f }, "Less than", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 180.0f, 240.0f }, MaxAngleString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 340.0f, 240.0f }, AngleString, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles
@@ -96,6 +142,7 @@ public:
 			}
 	}
 	bool OnUserUpdate(float fElapsedTime) override {
+		KnockbackSpeed = 12.0f * fElapsedTime;
 		PlayerSpeed = 6.0f * fElapsedTime;
 
 		//Camera variables
@@ -108,14 +155,16 @@ public:
 		//Draw background
 		DrawBGCamera();
 		//Enemy functions
+		SkeleFunctions.SpawnSkeleton(Skeles);
+		SkeleFunctions.Knockback(this, tv, Skeles, KnockbackSpeed);
 		SkeleFunctions.Collision(this, Skeles, PlayerPos, PlayerSpeed);
 		if (PlayerAttacked == true) {
 			SkeleFunctions.IsHit(this, tv, Skeles, PlayerAttacked, PlayerPos);
 		}
-		SkeleFunctions.SpawnSkeleton(Skeles);
+		
 		SkeleFunctions.DrawCalculation(this, PlayerPos, PlayerSpeed, Skeles);
 		//Update mouse pos (tv offset)
-		MousePos = MousePosFunc();
+		MousePos = MathFuncs.GetWorldMousePos(tv, this);
 		//Draw skeletons below player
 		SkeleFunctions.DrawBelowPlayer(tv, this, Skeles);
 		//Draw Player
