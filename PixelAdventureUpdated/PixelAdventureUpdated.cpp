@@ -149,9 +149,12 @@ public:
 		bool bOnScreen = camera.Update(fElapsedTime);
 		tv.SetWorldOffset(camera.GetViewPosition());
 
+		//Update mouse pos (tv offset)
+		MousePos = MathFuncs.GetWorldMousePos(tv, this);
+
 		//Player input
 		PlayerPos = P.PlayerInput(this, PlayerSpeed);
-		PlayerAttacked = P.AttackInput(this, fElapsedTime, PlayerAttacked);
+		PlayerAttacked = P.AttackInput(this, fElapsedTime, PlayerAttacked, MousePos);
 		//Draw background
 		DrawBGCamera();
 		//Enemy functions
@@ -163,20 +166,19 @@ public:
 		}
 		
 		SkeleFunctions.DrawCalculation(this, PlayerPos, PlayerSpeed, Skeles);
-		//Update mouse pos (tv offset)
-		MousePos = MathFuncs.GetWorldMousePos(tv, this);
 		//Draw skeletons below player
-		SkeleFunctions.DrawBelowPlayer(tv, this, Skeles);
+		SkeleFunctions.DrawBelowPlayer(tv, this, Skeles, DebugScreen);
 		//Draw Player
 		P.DrawPlayer(tv, this, fElapsedTime);
 		//Draw skeletons above player
-		SkeleFunctions.DrawAbovePlayer(tv, this, Skeles);
-		//Draw central player rectangle
-		tv.DrawRectDecal(PlayerPos, { 0.25f, 0.25f }, olc::WHITE);
-		//Draw player hitbox
-		tv.DrawRectDecal({ PlayerPos.x - 0.5f, PlayerPos.y - 1.0f}, { 1.0f, 2.0f }, olc::RED);
+		SkeleFunctions.DrawAbovePlayer(tv, this, Skeles, DebugScreen);
 		//Draw debug variables
 		if (DebugScreen == true) {
+			//Draw central player rectangle
+			tv.DrawRectDecal(PlayerPos, { 0.25f, 0.25f }, olc::WHITE);
+			//Draw player hitbox
+			tv.DrawRectDecal({ PlayerPos.x - 0.5f, PlayerPos.y - 1.0f }, { 1.0f, 2.0f }, olc::RED);
+
 			DebugVariables(PlayerPos);
 		}
 

@@ -10,6 +10,7 @@ public:
 	int RedSkeleTimer;
 	float KnockbackDist;
 	olc::vf2d Direction;
+	olc::vf2d SlideVelocity;
 };
 class SkeletonFunctions {
 private:
@@ -31,7 +32,7 @@ public:
 	void Collision(olc::PixelGameEngine* pge, std::vector<Skeletons>& Skeles, olc::vf2d PlayerPos, float PlayerSpeed);
 	void SpawnSkeleton(std::vector<Skeletons>& Skeles);
 	void DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed, std::vector<Skeletons> Skeles);
-	void DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles);
-	void DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles);
+	void DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles, bool DebugScreen);
+	void DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles, bool DebugScreen);
 	void Initialize();
 };

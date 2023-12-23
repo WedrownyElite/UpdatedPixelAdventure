@@ -20,11 +20,12 @@ void SkeletonFunctions::IsHit(olc::PixelGameEngine* pge, olc::TileTransformedVie
 			float angleTowards = MF.PointTo(PlayerPos, Skeles[k].SkelePos);
 			float angleDiff = MF.angleDifference(PlayerDir.polar().y, angleTowards);
 			olc::vf2d dir = (PlayerPos - Skeles[k].SkelePos).norm();
+
 			//Check if sweep hits
-			if (
-				(sqrt(pow(PlayerPos.x - Skeles[k].SkelePos.x, 2) + pow(PlayerPos.y - Skeles[k].SkelePos.y, 2)) < GlobalVars::maxDistance //Check to see if the target is in range (distance formula)
-					&& abs(angleDiff) < GlobalVars::maxAngle)  //See if the target's angle is within the sweeping arc range.
-				) {
+			float dx = PlayerPos.x - Skeles[k].SkelePos.x;
+			float dy = PlayerPos.y - Skeles[k].SkelePos.y;
+			float distanceSquared = dx * dx + dy * dy;
+			if (distanceSquared < GlobalVars::maxDistanceSquared && std::abs(angleDiff) < GlobalVars::maxAngle) {
 				Skeles[k].SkeleHit = 1;
 				PlayerAttacked = false;
 				Skeles[k].RedSkele = 1;
@@ -132,32 +133,44 @@ void SkeletonFunctions::DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d Pla
 		}
 	}
 }
-void SkeletonFunctions::DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles) {
+void SkeletonFunctions::DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles, bool DebugScreen) {
 	for (int k = 0; k < SkeleBelow.size(); k++) {
 		int i = SkeleBelow[k];
-		tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightDecal, {2.0f, 2.0f});
+		tv.DrawDecal({ Skeles[i].SkelePos.x - 0.8f, Skeles[i].SkelePos.y + 0.22f}, ShadowDecal, {1.5f, 1.5f});
 		//Draw red skele if hit
 		if (Skeles[i].RedSkele <= 15 && Skeles[i].RedSkele != 0) {
-			tv.DrawDecal({ Skeles[k].SkelePos.x - 1.0f, Skeles[k].SkelePos.y - 1.0f }, SkeleRightHurtDecal, { 2.0f, 2.0f });
+			tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightDecal, { 2.2f, 2.2f });
+			tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightHurtDecal, { 2.2f, 2.2f });
 		}
-		//Draw central skele rectangle
-		tv.DrawRectDecal(Skeles[i].SkelePos, { 0.25f, 0.25f }, olc::RED);
-		//Draw skele hitbox
-		tv.DrawRectDecal({ Skeles[i].SkelePos.x - 0.5f, Skeles[i].SkelePos.y - 1.0f }, { 1.2f, 2.0f }, olc::RED);
+		else {
+			tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightDecal, { 2.0f, 2.0f });
+		}
+		if (DebugScreen == true) {
+			//Draw central skele rectangle
+			tv.DrawRectDecal(Skeles[i].SkelePos, { 0.25f, 0.25f }, olc::RED);
+			//Draw skele hitbox
+			tv.DrawRectDecal({ Skeles[i].SkelePos.x - 0.5f, Skeles[i].SkelePos.y - 1.0f }, { 1.2f, 2.0f }, olc::RED);
+		}
 	}
 }
-void SkeletonFunctions::DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles) {
+void SkeletonFunctions::DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles, bool DebugScreen) {
 	for (int k = 0; k < SkeleAbove.size(); k++) {
 		int i = SkeleAbove[k];
-		tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightDecal, {2.0f, 2.0f});
+		tv.DrawDecal({ Skeles[i].SkelePos.x - 0.8f, Skeles[i].SkelePos.y + 0.22f }, ShadowDecal, { 1.5f, 1.5f });
 		//Draw red skele if hit
 		if (Skeles[i].RedSkele <= 15 && Skeles[i].RedSkele != 0) {
-			tv.DrawDecal({ Skeles[k].SkelePos.x - 1.0f, Skeles[k].SkelePos.y - 1.0f }, SkeleRightHurtDecal, { 2.0f, 2.0f });
+			tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightDecal, { 2.2f, 2.2f });
+			tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightHurtDecal, { 2.2f, 2.2f });
 		}
-		//Draw central skele rectangle
-		tv.DrawRectDecal(Skeles[i].SkelePos, { 0.25f, 0.25f }, olc::RED);
-		//Draw skele hitbox
-		tv.DrawRectDecal({ Skeles[i].SkelePos.x - 0.5f, Skeles[i].SkelePos.y - 1.0f }, { 1.2f, 2.0f }, olc::RED);
+		else {
+			tv.DrawDecal({ Skeles[i].SkelePos.x - 1.0f, Skeles[i].SkelePos.y - 1.0f }, SkeleRightDecal, { 2.0f, 2.0f });
+		}
+		if (DebugScreen == true) {
+			//Draw central skele rectangle
+			tv.DrawRectDecal(Skeles[i].SkelePos, { 0.25f, 0.25f }, olc::RED);
+			//Draw skele hitbox
+			tv.DrawRectDecal({ Skeles[i].SkelePos.x - 0.5f, Skeles[i].SkelePos.y - 1.0f }, { 1.2f, 2.0f }, olc::RED);
+		}
 	}
 }
 void SkeletonFunctions::Initialize() {
