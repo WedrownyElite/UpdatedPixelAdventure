@@ -23,6 +23,7 @@ public:
 	std::unique_ptr<olc::Sprite> WalkLeftSS;
 	std::unique_ptr<olc::Sprite> WalkRightSS;
 	std::unique_ptr<olc::Sprite> PlayerRightAttackSS;
+	std::unique_ptr<olc::Sprite> PlayerLeftAttackSS;
 
 	//Decals
 	olc::Decal* PlayerRightDecal;
@@ -32,8 +33,9 @@ public:
 	olc::Decal* WalkLeftSSDecal;
 	olc::Decal* WalkRightSSDecal;
 	olc::Decal* PlayerRightAttackSSDecal;
+	olc::Decal* PlayerLeftAttackSSDecal;
 
-	bool AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool PlayerAttacked, olc::vf2d MousePos);
+	void AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerAttacked, olc::vf2d MousePos);
 	bool MovingCheck(olc::PixelGameEngine* pge);
 	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed);
 	void DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime);

@@ -3,12 +3,15 @@
 
 olcPGEX_Animator2D animator;
 
-bool Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool PlayerAttacked, olc::vf2d MousePos) {
+void Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerAttacked, olc::vf2d MousePos) {
+	//Stop attack anim when over
+	if (!animator.GetAnim("Attack_Right")->bIsPlaying && !animator.GetAnim("Attack_Left")->bIsPlaying) {
+		AttackAnim = false;
+	}
 	//Attack input
 	if (CanAttack == true && pge->GetMouse(0).bPressed) {
 		olc::vf2d PlayerDir = (-(PlayerPos - MousePos).norm());
 		//Mouse click left
-		AttackAnim = true;
 		if (PlayerDir.x < 0.0f && PlayerDir.y <= 1.0f) {
 			Dir = false;
 		}
@@ -17,6 +20,24 @@ bool Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool Pla
 		}
 		CanAttack = false;
 		PlayerAttacked = true;
+
+		//Animation logic
+		//Left
+		if (Dir == false) {
+			if (!animator.GetAnim("Attack_Left")->bIsPlaying) {
+				AttackAnim = true;
+				animator.StopAll();
+				animator.Play("Attack_Left", true);
+			}
+		}
+		//Right
+		if (Dir == true) {
+			if (!animator.GetAnim("Attack_Right")->bIsPlaying) {
+				AttackAnim = true;
+				animator.StopAll();
+				animator.Play("Attack_Right", true);
+			}
+		}
 	}
 	//Attack cooldown
 	if (CanAttack == false) {
@@ -28,8 +49,6 @@ bool Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool Pla
 			CanAttack = true;
 		}
 	}
-
-	return PlayerAttacked;
 }
 bool Player::MovingCheck(olc::PixelGameEngine* pge) {
 	if ((!pge->GetKey(olc::Key::D).bHeld || !pge->GetKey(olc::Key::LEFT).bHeld)
@@ -76,6 +95,7 @@ olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed) {
 }
 void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime) {
 	tv.DrawDecal({ PlayerPos.x - 0.7f, PlayerPos.y + 0.22f }, ShadowDecal, { 1.5f, 1.5f });
+
 	//Facing Left
 	if (Dir == false && PlayerWalking == false && AttackAnim == false) {
 		animator.StopAll();
@@ -100,24 +120,17 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 			animator.Play("Walk_Right");
 		}
 	}
-	//Attack right
-	if (Dir == true && AttackAnim == true && PlayerWalking == false) {
-		if (!animator.GetAnim("Attack_Right")->bIsPlaying) {
-			animator.StopAll();
-			animator.Play("Attack_Right", true);
-		}
-	}
 	//Draw attack anim
-	if (animator.GetAnim("Attack_Right")->bIsPlaying) {
+	if (animator.GetAnim("Attack_Right")->bIsPlaying || animator.GetAnim("Attack_Left")->bIsPlaying) {
 		animator.UpdateAnimations(fElapsedTime);
 		//Right
 		if (Dir == true) {
 			animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 1.8f, PlayerPos.y - 2.0f }));
 		}
-	}
-	//Stop attack anim when over
-	if (!animator.GetAnim("Attack_Right")->bIsPlaying) {
-		AttackAnim = false;
+		//Left
+		if (Dir == false) {
+			animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 1.9f, PlayerPos.y - 2.0f }));
+		}
 	}
 	//Draw walk anim
 	if (PlayerWalking == true && AttackAnim == false) {
@@ -131,6 +144,7 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 			animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 1.9f, PlayerPos.y - 2.0f }));
 		}
 	}
+
 }
 
 void Player::Initialize() {
@@ -143,6 +157,7 @@ void Player::Initialize() {
 	WalkLeftSS = std::make_unique<olc::Sprite>("./Sprites/CharacterLeftFacing-Sheet.png");
 	WalkRightSS = std::make_unique<olc::Sprite>("./Sprites/CharacterRightFacing-Sheet.png");
 	PlayerRightAttackSS = std::make_unique<olc::Sprite>("./Sprites/CharacterRightAttacking-Sheet.png");
+	PlayerLeftAttackSS = std::make_unique<olc::Sprite>("./Sprites/CharacterLeftAttacking-Sheet.png");
 	//Decals
 	PlayerRightDecal = new olc::Decal(PlayerRight.get());
 	PlayerLeftDecal = new olc::Decal(PlayerLeft.get());
@@ -151,6 +166,7 @@ void Player::Initialize() {
 	WalkLeftSSDecal = new olc::Decal(WalkLeftSS.get());
 	WalkRightSSDecal = new olc::Decal(WalkRightSS.get());
 	PlayerRightAttackSSDecal = new olc::Decal(PlayerRightAttackSS.get());
+	PlayerLeftAttackSSDecal = new olc::Decal(PlayerLeftAttackSS.get());
 
 	//Animations
 	animator.AddAnimation("Walk_Right", 0.4f, 6, WalkRightSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
@@ -159,4 +175,6 @@ void Player::Initialize() {
 	animator.ScaleAnimation("Walk_Left", { 4.0f, 4.0f });
 	animator.AddAnimation("Attack_Right", 0.2f, 6, PlayerRightAttackSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
 	animator.ScaleAnimation("Attack_Right", { 4.0f, 4.0f });
+	animator.AddAnimation("Attack_Left", 0.2, 6, PlayerLeftAttackSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
+	animator.ScaleAnimation("Attack_Left", { 4.0f, 4.0f });
 }

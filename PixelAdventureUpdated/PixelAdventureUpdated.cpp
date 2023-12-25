@@ -111,7 +111,7 @@ public:
 		//Distance
 		float dist = sqrt(pow(PlayerPos.x - Skeles[0].SkelePos.x, 2) + pow(PlayerPos.y - Skeles[0].SkelePos.y, 2));
 		std::string distString = std::to_string(dist);
-		DrawStringDecal({ 10.0f, 220.0f }, "Less than 2.0f?", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 220.0f }, "Less than 1.8f?", olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 280.0f, 220.0f }, distString, olc::WHITE, { 2.0f, 2.0f });
 
 		//Angle
@@ -154,7 +154,7 @@ public:
 
 		//Player input
 		PlayerPos = P.PlayerInput(this, PlayerSpeed);
-		PlayerAttacked = P.AttackInput(this, fElapsedTime, PlayerAttacked, MousePos);
+		P.AttackInput(this, fElapsedTime, PlayerAttacked, MousePos);
 		//Draw background
 		DrawBGCamera();
 		//Enemy functions
