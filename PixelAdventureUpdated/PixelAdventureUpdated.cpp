@@ -34,6 +34,8 @@ public:
 	float KnockbackSpeed;
 	float PlayerSpeed;
 	bool PlayerAttacked = false;
+	bool PlayerWalking = false;
+	bool AttackAnim = false;
 	std::vector<Skeletons> Skeles;
 
 	olc::vf2d MousePos = { 300, 300 };
@@ -122,6 +124,18 @@ public:
 		DrawStringDecal({ 10.0f, 240.0f }, "Less than", olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 180.0f, 240.0f }, MaxAngleString, olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 340.0f, 240.0f }, AngleString, olc::WHITE, { 2.0f, 2.0f });
+
+		//AtackAnim
+		std::string AttackAnimString = std::to_string(AttackAnim);
+
+		DrawStringDecal({ 10.0f, 260.0f }, "Attack Anim", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 250.0f, 260.0f }, AttackAnimString, olc::WHITE, { 2.0f, 2.0f });
+
+		//PlayerWalking
+		std::string PlayerWalkingString = std::to_string(PlayerWalking);
+
+		DrawStringDecal({ 10.0f, 280.0f }, "PlayerWalking", olc::WHITE, { 2.0f,2.0f });
+		DrawStringDecal({ 300.0f, 280.0f }, PlayerWalkingString, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles
@@ -153,8 +167,8 @@ public:
 		MousePos = MathFuncs.GetWorldMousePos(tv, this);
 
 		//Player input
-		PlayerPos = P.PlayerInput(this, PlayerSpeed);
-		P.AttackInput(this, fElapsedTime, PlayerAttacked, MousePos);
+		PlayerPos = P.PlayerInput(this, PlayerSpeed, PlayerWalking);
+		P.AttackInput(this, fElapsedTime, PlayerAttacked, MousePos, AttackAnim);
 		//Draw background
 		DrawBGCamera();
 		//Enemy functions
@@ -169,7 +183,7 @@ public:
 		//Draw skeletons below player
 		SkeleFunctions.DrawBelowPlayer(tv, this, Skeles, DebugScreen);
 		//Draw Player
-		P.DrawPlayer(tv, this, fElapsedTime);
+		P.DrawPlayer(tv, this, fElapsedTime, PlayerWalking, AttackAnim);
 		//Draw skeletons above player
 		SkeleFunctions.DrawAbovePlayer(tv, this, Skeles, DebugScreen);
 		//Draw debug variables

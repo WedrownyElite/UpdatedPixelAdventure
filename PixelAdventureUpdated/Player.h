@@ -7,9 +7,7 @@ class Player {
 public:
 	olc::vf2d MovementDirection;
 	olc::vf2d UpdatedPlayerPos;
-	bool PlayerWalking = false;
 	bool CanAttack = true;
-	bool AttackAnim = false;
 	float AttackCooldown = 0.0f;
 	olc::vf2d PlayerPos = { 300, 300 };
 	//False = left, True = right
@@ -35,10 +33,11 @@ public:
 	olc::Decal* PlayerRightAttackSSDecal;
 	olc::Decal* PlayerLeftAttackSSDecal;
 
-	void AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerAttacked, olc::vf2d MousePos);
+	void AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerAttacked, olc::vf2d MousePos, bool& AttackAnim);
+	bool AttackAnimcheck();
 	bool MovingCheck(olc::PixelGameEngine* pge);
-	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed);
-	void DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime);
+	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed, bool& PlayerWalking);
+	void DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerWalking, bool& AttackAnim);
 	void Initialize();
 
 };

@@ -3,11 +3,7 @@
 
 olcPGEX_Animator2D animator;
 
-void Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerAttacked, olc::vf2d MousePos) {
-	//Stop attack anim when over
-	if (!animator.GetAnim("Attack_Right")->bIsPlaying && !animator.GetAnim("Attack_Left")->bIsPlaying) {
-		AttackAnim = false;
-	}
+void Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerAttacked, olc::vf2d MousePos, bool& AttackAnim) {
 	//Attack input
 	if (CanAttack == true && pge->GetMouse(0).bPressed) {
 		olc::vf2d PlayerDir = (-(PlayerPos - MousePos).norm());
@@ -25,7 +21,6 @@ void Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& Pl
 		//Left
 		if (Dir == false) {
 			if (!animator.GetAnim("Attack_Left")->bIsPlaying) {
-				AttackAnim = true;
 				animator.StopAll();
 				animator.Play("Attack_Left", true);
 			}
@@ -33,7 +28,6 @@ void Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& Pl
 		//Right
 		if (Dir == true) {
 			if (!animator.GetAnim("Attack_Right")->bIsPlaying) {
-				AttackAnim = true;
 				animator.StopAll();
 				animator.Play("Attack_Right", true);
 			}
@@ -50,6 +44,14 @@ void Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& Pl
 		}
 	}
 }
+bool AttackAnimCheck() {
+	if (!animator.GetAnim("Attack_Right")->bIsPlaying && !animator.GetAnim("Attack_Left")->bIsPlaying) {
+		return false;
+	}
+	else {
+		return true;
+	}
+}
 bool Player::MovingCheck(olc::PixelGameEngine* pge) {
 	if ((!pge->GetKey(olc::Key::D).bHeld || !pge->GetKey(olc::Key::LEFT).bHeld)
 		&& (!pge->GetKey(olc::Key::A).bHeld || !pge->GetKey(olc::Key::RIGHT).bHeld)
@@ -59,7 +61,7 @@ bool Player::MovingCheck(olc::PixelGameEngine* pge) {
 	}
 	return true;
 }
-olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed) {
+olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed, bool& PlayerWalking) {
 	MovementDirection = { 0, 0 };
 	//Not moving
 	if (!MovingCheck(pge)) {
@@ -93,28 +95,27 @@ olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed) {
 	PlayerPos += PlayerSpeed * MovementDirection;
 	return PlayerPos;
 }
-void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime) {
+void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerWalking, bool& AttackAnim) {
 	tv.DrawDecal({ PlayerPos.x - 0.7f, PlayerPos.y + 0.22f }, ShadowDecal, { 1.5f, 1.5f });
-
 	//Facing Left
-	if (Dir == false && PlayerWalking == false && AttackAnim == false) {
+	if (Dir == false && PlayerWalking == false && !AttackAnimCheck()) {
 		animator.StopAll();
-		tv.DrawDecal({ PlayerPos.x - 1.9f, PlayerPos.y - 2.0f }, PlayerLeftDecal, { 4.0f, 4.0f });
+		animator.Play("Idle_Left");
 	}
 	//Facing Right
-	if (Dir == true && PlayerWalking == false && AttackAnim == false) {
+	if (Dir == true && PlayerWalking == false && !AttackAnimCheck()) {
 		animator.StopAll();
-		tv.DrawDecal({ PlayerPos.x - 1.80f, PlayerPos.y - 2.0f }, PlayerRightDecal, { 4.0f, 4.0f });
+		animator.Play("Idle_Right");
 	}
 	//Walking Left
-	if (Dir == false && PlayerWalking == true && AttackAnim == false) {
+	if (Dir == false && PlayerWalking == true && !AttackAnimCheck()) {
 		if (!animator.GetAnim("Walk_Left")->bIsPlaying) {
 			animator.StopAll();
 			animator.Play("Walk_Left");
 		}
 	}
 	//Walking Right
-	if (Dir == true && PlayerWalking == true && AttackAnim == false) {
+	if (Dir == true && PlayerWalking == true && !AttackAnimCheck()) {
 		if (!animator.GetAnim("Walk_Right")->bIsPlaying) {
 			animator.StopAll();
 			animator.Play("Walk_Right");
@@ -133,7 +134,7 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 		}
 	}
 	//Draw walk anim
-	if (PlayerWalking == true && AttackAnim == false) {
+	if (PlayerWalking == true && !AttackAnimCheck()) {
 		animator.UpdateAnimations(fElapsedTime);
 		//Right
 		if (Dir == true) {
@@ -143,6 +144,13 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 		if (Dir == false) {
 			animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 1.9f, PlayerPos.y - 2.0f }));
 		}
+	}
+	//Draw idle anim
+	if (animator.GetAnim("Idle_Left")->bIsPlaying) {
+		animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 1.9f, PlayerPos.y - 2.0f }));
+	}
+	if (animator.GetAnim("Idle_Right")->bIsPlaying) {
+		animator.DrawAnimationFrame(tv.WorldToScreen({ PlayerPos.x - 1.80f, PlayerPos.y - 2.0f }));
 	}
 
 }
@@ -177,4 +185,8 @@ void Player::Initialize() {
 	animator.ScaleAnimation("Attack_Right", { 4.0f, 4.0f });
 	animator.AddAnimation("Attack_Left", 0.2, 6, PlayerLeftAttackSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
 	animator.ScaleAnimation("Attack_Left", { 4.0f, 4.0f });
+	animator.AddAnimation("Idle_Right", 0.1f, 1, PlayerRightDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
+	animator.ScaleAnimation("Idle_Right", { 4.0f, 4.0f });
+	animator.AddAnimation("Idle_Left", 0.1f, 1, PlayerLeftDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
+	animator.ScaleAnimation("Idle_Left", { 4.0f, 4.0f });
 }
