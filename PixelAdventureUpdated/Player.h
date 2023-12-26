@@ -1,11 +1,14 @@
 #pragma once
 #include "olcPixelGameEngine.h"
 #include "olcPGEX_TransformedView.h"
+#include "olcPGEX_Animator2D.h"
 #include "GlobalVariables.h"
 
 class Player {
 
 public:
+	olcPGEX_Animator2D animator;
+
 	olc::vf2d MovementDirection;
 	olc::vf2d UpdatedPlayerPos;
 	bool CanAttack = true;
@@ -30,12 +33,12 @@ public:
 	olc::Decal* PlayerDeadDecal;
 	olc::Decal* ShadowDecal;
 	olc::Decal* WalkLeftSSDecal;
-	olc::Decal* WalkRightSSDecal;
+	olc::Decal* WalkRightSSDecal;	
 	olc::Decal* PlayerRightAttackSSDecal;
 	olc::Decal* PlayerLeftAttackSSDecal;
 
 	void AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerAttacked, olc::vf2d MousePos, bool& AttackAnim);
-	bool AttackAnimcheck();
+	bool AttackAnimCheck();
 	bool MovingCheck(olc::PixelGameEngine* pge);
 	olc::vf2d PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed, bool& PlayerWalking);
 	void DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerWalking, bool& AttackAnim);

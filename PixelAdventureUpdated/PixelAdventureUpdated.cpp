@@ -7,6 +7,7 @@
 #include "olcPGEX_Animator2D.h"
 
 #include <iostream>
+#include <random>
 
 #include "Player.h"
 #include "Skeletons.h"
@@ -31,99 +32,131 @@ public:
 	// The world map, stored as a 1D array
 	std::vector<uint8_t> vWorldMap;
 
+	int rand_num;
+
 	float KnockbackSpeed;
 	float PlayerSpeed;
 	bool PlayerAttacked = false;
 	bool PlayerWalking = false;
 	bool AttackAnim = false;
+
+	int o = 0;
 	std::vector<Skeletons> Skeles;
 
 	olc::vf2d MousePos = { 300, 300 };
 
 	olc::vf2d PlayerPos = { 300, 300 };
 	//Sprites
-	std::unique_ptr<olc::Sprite> Grass;
+	std::unique_ptr<olc::Sprite> Grass1;
+	std::unique_ptr<olc::Sprite> Grass2;
+	std::unique_ptr<olc::Sprite> Grass3;
+	std::unique_ptr<olc::Sprite> Grass4;
 	//Decals
-	olc::Decal* GrassDecal;
+	olc::Decal* Grass1Decal;
+	olc::Decal* Grass2Decal;
+	olc::Decal* Grass3Decal;
+	olc::Decal* Grass4Decal;
 
 	Pixel_Adventure() {
 		sAppName = "Pixel Adventure";
 	}
-
+	uint32_t nLehmer = 0;
+	uint32_t Lehmer32() {
+		nLehmer += 0xe120fc15;
+		uint64_t tmp;
+		tmp = (uint64_t)nLehmer * 0x4a39b70d;
+		uint32_t  m1 = (tmp >> 32) ^ tmp;
+		tmp = (uint64_t)m1 * 0x12fad5c0;
+		uint32_t m2 = (tmp >> 32) ^ tmp;
+		return m2;
+	}
 	void DebugVariables(olc::vf2d PlayerPos) {
+		//FPS
+		std::string FPSString = std::to_string(GetFPS());
+
+		DrawStringDecal({ 10.0f, 10.0f }, "FPS:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 80.0f, 10.0f }, FPSString, olc::WHITE, { 2.0f, 2.0f });
+
 		//MousePos (tv offset)
 		std::string MousePosXString = std::to_string(MousePos.x);
 		std::string MousePosYString = std::to_string(MousePos.y);
 
-		DrawStringDecal({ 10.0f, 10.0f }, "MousePos:", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 170.0f, 10.0f }, MousePosXString, olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 350.0f, 10.0f }, MousePosYString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 30.0f }, "MousePos:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 170.0f, 30.0f }, MousePosXString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 350.0f, 30.0f }, MousePosYString, olc::WHITE, { 2.0f, 2.0f });
 
 		//PlayerPos
 		std::string PlayerPosXString = std::to_string(PlayerPos.x);
 		std::string PlayerPosYString = std::to_string(PlayerPos.y);
 
-		DrawStringDecal({ 10.0f, 40.0f }, "PlayerPos:", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 170.0f, 40.0f }, PlayerPosXString, olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 350.0f, 40.0f }, PlayerPosYString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 50.0f }, "PlayerPos:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 170.0f, 50.0f }, PlayerPosXString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 350.0f, 50.0f }, PlayerPosYString, olc::WHITE, { 2.0f, 2.0f });
 
-		//FPS
-		std::string FPSString = std::to_string(GetFPS());
+		//PlayerSpeed
+		std::string PlayerSpeedString = std::to_string(PlayerSpeed);
 
-		DrawStringDecal({ 10.0f, 80.0f }, "FPS:", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 80.0f, 80.0f }, FPSString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 70.0f }, "PlayerSpeed:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 220.0f, 70.0f }, PlayerSpeedString, olc::WHITE, { 2.0f, 2.0f });
 
 		//PlayerAttacked
 		std::string PlayerAttackedString = std::to_string(PlayerAttacked);
 
-		DrawStringDecal({ 10.0f, 120.0f }, "PlayerAttacked", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 250.0f, 120.0f }, PlayerAttackedString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 90.0f }, "PlayerAttacked", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 250.0f, 90.0f }, PlayerAttackedString, olc::WHITE, { 2.0f, 2.0f });
 
 		//Player dir
 		olc::vf2d PlayerDir = (-(PlayerPos - MousePos).norm());
 		std::string PlayerDirX = std::to_string(PlayerDir.x);
 		std::string PlayerDirY = std::to_string(PlayerDir.y);
-		DrawStringDecal({ 10.0f, 140.0f }, "PlayerDir:", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 180.0f, 140.0f }, PlayerDirX, olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 350.0f, 140.0f }, PlayerDirY, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 110.0f }, "PlayerDir:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 180.0f, 110.0f }, PlayerDirX, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 350.0f, 110.0f }, PlayerDirY, olc::WHITE, { 2.0f, 2.0f });
 
 		//Angle towards
 		float angleTowards = MathFuncs.PointTo(PlayerPos, Skeles[0].SkelePos);
 		std::string angleTowardsString = std::to_string(angleTowards);
 
-		DrawStringDecal({ 10.0f, 160.0f }, "AngleTowards:", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 220.0f, 160.0f }, angleTowardsString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 130.0f }, "AngleTowards:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 220.0f, 130.0f }, angleTowardsString, olc::WHITE, { 2.0f, 2.0f });
 
 		//AngleDiff
 		float angleDiff = MathFuncs.angleDifference(PlayerDir.polar().y, angleTowards);
 		std::string angleDiffString = std::to_string(angleDiff);
 
-		DrawStringDecal({ 10.0f, 180.0f }, "AngleDiff:", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 180.0f, 180.0f }, angleDiffString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 150.0f }, "AngleDiff:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 180.0f, 150.0f }, angleDiffString, olc::WHITE, { 2.0f, 2.0f });
 
 		//Direction
 		olc::vf2d dir = (PlayerPos - Skeles[0].SkelePos).norm();
 		std::string dirX = std::to_string(dir.x);
 		std::string dirY = std::to_string(dir.y);
 
-		DrawStringDecal({ 10.0f, 200.0f }, "Direction:", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 170.0f, 200.0f }, dirX, olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 320.0f, 200.0f }, dirY, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 170.0f }, "Direction:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 170.0f, 170.0f }, dirX, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 320.0f, 170.0f }, dirY, olc::WHITE, { 2.0f, 2.0f });
 
 		//Distance
 		float dist = sqrt(pow(PlayerPos.x - Skeles[0].SkelePos.x, 2) + pow(PlayerPos.y - Skeles[0].SkelePos.y, 2));
 		std::string distString = std::to_string(dist);
-		DrawStringDecal({ 10.0f, 220.0f }, "Less than 1.8f?", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 280.0f, 220.0f }, distString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 190.0f }, "Less than 1.8f?", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 280.0f, 190.0f }, distString, olc::WHITE, { 2.0f, 2.0f });
 
 		//Angle
 		float Angle = abs(angleDiff);
 		std::string AngleString = std::to_string(Angle);
 		std::string MaxAngleString = std::to_string(GlobalVars::maxAngle);
 		
-		DrawStringDecal({ 10.0f, 240.0f }, "Less than", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 180.0f, 240.0f }, MaxAngleString, olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 340.0f, 240.0f }, AngleString, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 210.0f }, "Less than", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 160.0f, 210.0f }, MaxAngleString, olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 285.0f, 210.0f }, "f?", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 340.0f, 210.0f }, AngleString, olc::WHITE, { 2.0f, 2.0f });
+
+		//RandoNum
+
+		std::string RandNumString = std::to_string(rand_num);
+
+		DrawStringDecal({ 10.0f, 250.0f }, RandNumString, olc::WHITE, { 2.0f, 2.0f });
 
 		//PlayerState
 		std::string PlayerStateString = std::to_string(GlobalVars::PlayerState);
@@ -146,8 +179,17 @@ public:
 		if (PlayerStateString == "5") {
 			PlayerStateStringUpdated = "Attack right";
 		}
-		DrawStringDecal({ 10.0f, 260.0f }, "PlayerState:", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 210.0f, 260.0f }, PlayerStateStringUpdated, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 10.0f, 230.0f }, "PlayerState:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 210.0f, 230.0f }, PlayerStateStringUpdated, olc::WHITE, { 2.0f, 2.0f });
+
+		//Lehmer output
+		std::string LehmerString = std::to_string(Lehmer32() % 256);
+
+		DrawStringDecal({ 10.0f, 250.0f }, "Lehmer:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 150.0f, 250.0f }, LehmerString, olc::WHITE, { 2.0f, 2.0f });
+
+		std::string ostring = std::to_string(o);
+		DrawStringDecal({ 10.0f, 270.0f }, ostring, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles
@@ -155,21 +197,51 @@ public:
 		olc::vi2d vTileBR = tv.GetBottomRightTile().min(m_vWorldSize);
 		olc::vi2d vTile;
 
+		std::random_device rd;
+		std::mt19937 mt(rd());
+		std::uniform_int_distribution<int> dist(0, 256);
 		for (vTile.y = vTileTL.y; vTile.y < vTileBR.y; vTile.y++)
 			for (vTile.x = vTileTL.x; vTile.x < vTileBR.x; vTile.x++)
 			{
-				int idx = vTile.y * m_vWorldSize.x + vTile.x;
+				int nSeed = vTile.y << 16 | vTile.x;
+				//mt.seed(nSeed);
+				nLehmer = nSeed;
+				uint32_t rand_num = Lehmer32() % 256;
+				//int idx = vTile.y * m_vWorldSize.x + vTile.x;
+				if (rand_num <= 120) {
+					tv.DrawDecal(vTile, Grass1Decal, { 1.0f, 1.0f });
+					//tv.DrawDecal(vTile, Grass2Decal, { 1.0f, 1.0f });
+				}
 
-				if (vWorldMap[idx] == 0)
-					tv.DrawDecal(vTile, GrassDecal, { 1.0f, 1.0f });
-
-				if (vWorldMap[idx] == 1)
-					tv.DrawDecal(vTile, GrassDecal, { 1.0f, 1.0f });
+				if (rand_num > 120 && rand_num <= 253) {
+					//tv.DrawDecal(vTile, Grass1Decal, { 1.0f, 1.0f });
+					tv.DrawDecal(vTile, Grass2Decal, { 1.0f, 1.0f });
+				}
+				if (rand_num == 254) {
+					tv.DrawDecal(vTile, Grass4Decal, { 1.0f, 1.0f });
+				}
+				if (rand_num == 255) {
+					tv.DrawDecal(vTile, Grass3Decal, { 1.0f, 1.0f });
+				}
 			}
 	}
 	bool OnUserUpdate(float fElapsedTime) override {
+		if (GetKey(olc::Key::P).bPressed) {
+			o++;
+		}
+		if (GetKey(olc::Key::L).bPressed) {
+			o--;
+		}
 		KnockbackSpeed = 12.0f * fElapsedTime;
-		PlayerSpeed = 6.0f * fElapsedTime;
+		if (P.animator.GetAnim("Attack_Left")->bIsPlaying || P.animator.GetAnim("Attack_Right")->bIsPlaying) {
+			PlayerSpeed = 3.0f * fElapsedTime;
+		}
+		if (GetKey(olc::Key::SHIFT).bHeld) {
+			PlayerSpeed = 20.0f * fElapsedTime;
+		}
+		else {
+			PlayerSpeed = 6.0f * fElapsedTime;
+		}
 
 		//Camera variables
 		bool bOnScreen = camera.Update(fElapsedTime);
@@ -221,9 +293,15 @@ public:
 private:
 	bool OnUserCreate() override {
 		//Sprites
-		Grass = std::make_unique<olc::Sprite>("./Sprites/Grass.png");
+		Grass1 = std::make_unique<olc::Sprite>("./Sprites/Grass1.png");
+		Grass2 = std::make_unique<olc::Sprite>("./Sprites/Grass2.png");
+		Grass3 = std::make_unique<olc::Sprite>("./Sprites/Grass3.png");
+		Grass4 = std::make_unique<olc::Sprite>("./Sprites/Grass4.png");
 		//Decals
-		GrassDecal = new olc::Decal(Grass.get());
+		Grass1Decal = new olc::Decal(Grass1.get());
+		Grass2Decal = new olc::Decal(Grass2.get());
+		Grass3Decal = new olc::Decal(Grass3.get());
+		Grass4Decal = new olc::Decal(Grass4.get());
 
 		// Construct transform view
 		tv = olc::TileTransformedView(GetScreenSize(), m_vTileSize);

@@ -1,7 +1,4 @@
 #include "Player.h"
-#include "olcPGEX_Animator2D.h"
-
-olcPGEX_Animator2D animator;
 
 void Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& PlayerAttacked, olc::vf2d MousePos, bool& AttackAnim) {
 	//Attack input
@@ -38,7 +35,7 @@ void Player::AttackInput(olc::PixelGameEngine* pge, float fElapsedTime, bool& Pl
 		}
 	}
 }
-bool AttackAnimCheck() {
+bool Player::AttackAnimCheck() {
 	if (!animator.GetAnim("Attack_Right")->bIsPlaying && !animator.GetAnim("Attack_Left")->bIsPlaying) {
 		return false;
 	}
@@ -102,7 +99,7 @@ olc::vf2d Player::PlayerInput(olc::PixelGameEngine* pge, float PlayerSpeed, bool
 			GlobalVars::PlayerState = GlobalVars::WALKING_RIGHT;
 		}
 	}
-	if (PlayerWalking == true) {
+	if (GlobalVars::PlayerState == GlobalVars::WALKING_LEFT || GlobalVars::PlayerState == GlobalVars::WALKING_RIGHT) {
 		MovementDirection = MovementDirection.norm();
 	}
 	PlayerPos += PlayerSpeed * MovementDirection;
@@ -115,7 +112,13 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 	if (GlobalVars::PlayerState == GlobalVars::ATTACK_LEFT) {
 		if (!animator.GetAnim("Attack_Left")->bIsPlaying) {
 			animator.StopAll();
-			animator.Play("Attack_Left");
+			animator.Play("Attack_Left", true);
+			if (PlayerWalking == false) {
+				animator.SetNextAnimation("Attack_Left", "Idle_Left");
+			}
+			if (PlayerWalking == true) {
+				animator.SetNextAnimation("Attack_Left", "Walk_Left");
+			}
 		}
 	}
 	//Attack Right
@@ -123,6 +126,12 @@ void Player::DrawPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge,
 		if (!animator.GetAnim("Attack_Right")->bIsPlaying) {
 			animator.StopAll();
 			animator.Play("Attack_Right", true);
+			if (PlayerWalking == false) {
+				animator.SetNextAnimation("Attack_Right", "Idle_Right");
+			}
+			if (PlayerWalking == true) {
+				animator.SetNextAnimation("Attack_Right", "Walk_Right");
+			}
 		}
 	}
 	//Facing Left
@@ -209,7 +218,7 @@ void Player::Initialize() {
 	animator.ScaleAnimation("Walk_Right", { 4.0f, 4.0f });
 	animator.AddAnimation("Walk_Left", 0.4f, 6, WalkLeftSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
 	animator.ScaleAnimation("Walk_Left", { 4.0f, 4.0f });
-	animator.AddAnimation("Attack_Right", 2.0f, 6, PlayerRightAttackSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
+	animator.AddAnimation("Attack_Right", 0.2f, 6, PlayerRightAttackSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
 	animator.ScaleAnimation("Attack_Right", { 4.0f, 4.0f });
 	animator.AddAnimation("Attack_Left", 0.2, 6, PlayerLeftAttackSSDecal, { 0.0f, 0.0f }, { 32.0f, 32.0f }, { 0.0f, 0.0f });
 	animator.ScaleAnimation("Attack_Left", { 4.0f, 4.0f });
