@@ -125,17 +125,29 @@ public:
 		DrawStringDecal({ 180.0f, 240.0f }, MaxAngleString, olc::WHITE, { 2.0f, 2.0f });
 		DrawStringDecal({ 340.0f, 240.0f }, AngleString, olc::WHITE, { 2.0f, 2.0f });
 
-		//AtackAnim
-		std::string AttackAnimString = std::to_string(AttackAnim);
-
-		DrawStringDecal({ 10.0f, 260.0f }, "Attack Anim", olc::WHITE, { 2.0f, 2.0f });
-		DrawStringDecal({ 250.0f, 260.0f }, AttackAnimString, olc::WHITE, { 2.0f, 2.0f });
-
-		//PlayerWalking
-		std::string PlayerWalkingString = std::to_string(PlayerWalking);
-
-		DrawStringDecal({ 10.0f, 280.0f }, "PlayerWalking", olc::WHITE, { 2.0f,2.0f });
-		DrawStringDecal({ 300.0f, 280.0f }, PlayerWalkingString, olc::WHITE, { 2.0f, 2.0f });
+		//PlayerState
+		std::string PlayerStateString = std::to_string(GlobalVars::PlayerState);
+		std::string PlayerStateStringUpdated;
+		if (PlayerStateString == "0") {
+			PlayerStateStringUpdated = "Walking left";
+		}
+		if (PlayerStateString == "1") {
+			PlayerStateStringUpdated = "Walking right";
+		}
+		if (PlayerStateString == "2") {
+			PlayerStateStringUpdated = "Idle left";
+		}
+		if (PlayerStateString == "3") {
+			PlayerStateStringUpdated = "Idle right";
+		}
+		if (PlayerStateString == "4") {
+			PlayerStateStringUpdated = "Attack left";
+		}
+		if (PlayerStateString == "5") {
+			PlayerStateStringUpdated = "Attack right";
+		}
+		DrawStringDecal({ 10.0f, 260.0f }, "PlayerState:", olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 210.0f, 260.0f }, PlayerStateStringUpdated, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles

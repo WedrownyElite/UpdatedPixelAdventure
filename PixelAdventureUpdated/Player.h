@@ -1,6 +1,7 @@
 #pragma once
 #include "olcPixelGameEngine.h"
 #include "olcPGEX_TransformedView.h"
+#include "GlobalVariables.h"
 
 class Player {
 
