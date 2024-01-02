@@ -5,4 +5,5 @@
 class EnemyFunctions {
 public:
 	olc::vf2d HitKnockback(olc::PixelGameEngine* pge, int IsHit, olc::vf2d EnemyPos, olc::vf2d PlayerPos);
+	void IdleActivityTimer(float fElapsedTime, float& TargetTime, float& Timer, bool& ActiveBool);
 };

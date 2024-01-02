@@ -60,16 +60,6 @@ public:
 	Pixel_Adventure() {
 		sAppName = "Pixel Adventure";
 	}
-	uint32_t nLehmer = 0;
-	uint32_t Lehmer32() {
-		nLehmer += 0xe120fc15;
-		uint64_t tmp;
-		tmp = (uint64_t)nLehmer * 0x4a39b70d;
-		uint32_t  m1 = (tmp >> 32) ^ tmp;
-		tmp = (uint64_t)m1 * 0x12fad5c0;
-		uint32_t m2 = (tmp >> 32) ^ tmp;
-		return m2;
-	}
 	void DebugVariables(olc::vf2d PlayerPos) {
 		//FPS
 		std::string FPSString = std::to_string(GetFPS());
@@ -181,15 +171,6 @@ public:
 		}
 		DrawStringDecal({ 10.0f, 230.0f }, "PlayerState:", olc::BLUE, { 2.0f, 2.0f });
 		DrawStringDecal({ 210.0f, 230.0f }, PlayerStateStringUpdated, olc::WHITE, { 2.0f, 2.0f });
-
-		//Lehmer output
-		std::string LehmerString = std::to_string(Lehmer32() % 256);
-
-		DrawStringDecal({ 10.0f, 250.0f }, "Lehmer:", olc::BLUE, { 2.0f, 2.0f });
-		DrawStringDecal({ 150.0f, 250.0f }, LehmerString, olc::WHITE, { 2.0f, 2.0f });
-
-		std::string ostring = std::to_string(o);
-		DrawStringDecal({ 10.0f, 270.0f }, ostring, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles
@@ -205,8 +186,8 @@ public:
 			{
 				int nSeed = vTile.y << 16 | vTile.x;
 				//mt.seed(nSeed);
-				nLehmer = nSeed;
-				uint32_t rand_num = Lehmer32() % 256;
+				uint64_t nLehmer = nSeed;
+				uint32_t rand_num = MathFuncs.Lehmer32(nLehmer) % 256;
 				//int idx = vTile.y * m_vWorldSize.x + vTile.x;
 				if (rand_num <= 120) {
 					tv.DrawDecal(vTile, Grass1Decal, { 1.0f, 1.0f });
@@ -226,19 +207,16 @@ public:
 			}
 	}
 	bool OnUserUpdate(float fElapsedTime) override {
-		if (GetKey(olc::Key::P).bPressed) {
-			o++;
-		}
-		if (GetKey(olc::Key::L).bPressed) {
-			o--;
-		}
 		KnockbackSpeed = 12.0f * fElapsedTime;
+		//Attacking
 		if (P.animator.GetAnim("Attack_Left")->bIsPlaying || P.animator.GetAnim("Attack_Right")->bIsPlaying) {
 			PlayerSpeed = 3.0f * fElapsedTime;
 		}
+		//Sprinting
 		if (GetKey(olc::Key::SHIFT).bHeld) {
-			PlayerSpeed = 20.0f * fElapsedTime;
+			PlayerSpeed = 10.0f * fElapsedTime;
 		}
+		//Walking
 		else {
 			PlayerSpeed = 6.0f * fElapsedTime;
 		}
@@ -256,14 +234,7 @@ public:
 		//Draw background
 		DrawBGCamera();
 		//Enemy functions
-		SkeleFunctions.SpawnSkeleton(Skeles);
-		SkeleFunctions.Knockback(this, tv, Skeles, KnockbackSpeed);
-		SkeleFunctions.Collision(this, Skeles, PlayerPos, PlayerSpeed);
-		if (PlayerAttacked == true) {
-			SkeleFunctions.IsHit(this, tv, Skeles, PlayerAttacked, PlayerPos);
-		}
-		
-		SkeleFunctions.DrawCalculation(this, PlayerPos, PlayerSpeed, Skeles);
+		SkeleFunctions.Functions(tv, this, Skeles, KnockbackSpeed, PlayerSpeed, fElapsedTime, PlayerPos, PlayerAttacked);
 		//Draw skeletons below player
 		SkeleFunctions.DrawBelowPlayer(tv, this, Skeles, DebugScreen);
 		//Draw Player

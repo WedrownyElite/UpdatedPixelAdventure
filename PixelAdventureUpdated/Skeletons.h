@@ -1,6 +1,7 @@
 #pragma once
 #include "olcPixelGameEngine.h"
 #include "olcPGEX_TransformedView.h"
+#include "GlobalVariables.h"
 
 class Skeletons {
 public:
@@ -10,29 +11,40 @@ public:
 	int RedSkeleTimer;
 	float KnockbackDist;
 	olc::vf2d Direction;
-	olc::vf2d SlideVelocity;
+	olc::vf2d ActivityDirection;
+	enum SkeletonStateEnum { IDLE_LEFT, IDLE_RIGHT, IDLE_WALK_LEFT, IDLE_WALK_RIGHT, WALK_LEFT, WALK_RIGHT, ATTACK_LEFT, ATTACK_RIGHT };
+	SkeletonStateEnum SkeletonState;
+	bool CurrentlyActive;
+	bool ActivityCooldownBool;
+	float ActivityCooldown;
+	float ActivityCooldownTarget;
 };
 class SkeletonFunctions {
 private:
 	//Sprites
 	std::unique_ptr<olc::Sprite> SkeleRight;
+	std::unique_ptr<olc::Sprite> SkeleLeft;
 	std::unique_ptr<olc::Sprite> SkeleRightHurt;
+	std::unique_ptr<olc::Sprite> SkeleLeftHurt;
 	std::unique_ptr<olc::Sprite> Shadow;
 
 	//Decals
 	olc::Decal* SkeleRightDecal;
+	olc::Decal* SkeleLeftDecal;
 	olc::Decal* SkeleRightHurtDecal;
+	olc::Decal* SkeleLeftHurtDecal;
 	olc::Decal* ShadowDecal;
 
 	std::vector<int> SkeleBelow;
 	std::vector<int> SkeleAbove;
 public:
-	void IsHit(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, std::vector<Skeletons>& Skeles, bool& PlayerAttacked, olc::vf2d PlayeroPos);
-	void Knockback(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, std::vector<Skeletons>& Skeles, float KnockbackSpeed);
-	void Collision(olc::PixelGameEngine* pge, std::vector<Skeletons>& Skeles, olc::vf2d PlayerPos, float PlayerSpeed);
+	void IsHit(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, Skeletons& skele, bool& PlayerAttacked, olc::vf2d PlayerPos);
+	void Knockback(Skeletons& skele, float KnockbackSpeed);
+	void Collision(Skeletons& skele, olc::vf2d PlayerPos, float PlayerSpeed);
 	void SpawnSkeleton(std::vector<Skeletons>& Skeles);
 	void DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed, std::vector<Skeletons> Skeles);
 	void DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles, bool DebugScreen);
 	void DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles, bool DebugScreen);
+	void Functions(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons>& Skeles, float KnockbackSpeed, float PlayerSpeed, float fElapsedTime, olc::vf2d PlayerPos, bool& PlayerAttacked);
 	void Initialize();
 };

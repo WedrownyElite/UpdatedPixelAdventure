@@ -8,3 +8,14 @@ olc::vf2d EnemyFunctions::HitKnockback(olc::PixelGameEngine* pge, int IsHit, olc
 	}
 	return EnemyPos;
 }
+void EnemyFunctions::IdleActivityTimer(float fElapsedTime, float& TargetTime, float& Timer, bool& CooldownBool) {
+	//Cooldown
+	if (Timer < TargetTime) {
+		Timer += fElapsedTime;
+	}
+	//Cooldown ended
+	if (Timer >= TargetTime) {
+		Timer = 0.0f;
+		TargetTime = 0.0f;
+	}
+}

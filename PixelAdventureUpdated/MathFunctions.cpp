@@ -26,3 +26,12 @@ olc::vf2d MathFunctions::GetWorldMousePos(olc::TileTransformedView& tv, olc::Pix
 float MathFunctions::PointTo(olc::vf2d pos1, olc::vf2d pos2) {
 	return atan2(pos2.y - pos1.y, pos2.x - pos1.x);
 }
+uint32_t MathFunctions::Lehmer32(uint32_t nLehmer) {
+	nLehmer += 0xe120fc15;
+	uint64_t tmp;
+	tmp = (uint64_t)nLehmer * 0x4a39b70d;
+	uint32_t  m1 = (tmp >> 32) ^ tmp;
+	tmp = (uint64_t)m1 * 0x12fad5c0;
+	uint32_t m2 = (tmp >> 32) ^ tmp;
+	return m2;
+}
