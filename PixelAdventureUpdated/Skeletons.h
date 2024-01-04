@@ -11,13 +11,16 @@ public:
 	int RedSkeleTimer;
 	float KnockbackDist;
 	olc::vf2d Direction;
-	olc::vf2d ActivityDirection;
 	enum SkeletonStateEnum { IDLE_LEFT, IDLE_RIGHT, IDLE_WALK_LEFT, IDLE_WALK_RIGHT, WALK_LEFT, WALK_RIGHT, ATTACK_LEFT, ATTACK_RIGHT };
 	SkeletonStateEnum SkeletonState;
 	bool CurrentlyActive;
 	bool ActivityCooldownBool;
+	olc::vf2d HomePos;
+	olc::vf2d WanderingGoal;
+	float GoalDist;
+	olc::vf2d WanderingDir;
+
 	float ActivityCooldown;
-	float ActivityCooldownTarget;
 };
 class SkeletonFunctions {
 private:
@@ -37,7 +40,10 @@ private:
 
 	std::vector<int> SkeleBelow;
 	std::vector<int> SkeleAbove;
+
+	float IdleSpeed;
 public:
+
 	void IsHit(olc::PixelGameEngine* pge, olc::TileTransformedView& tv, Skeletons& skele, bool& PlayerAttacked, olc::vf2d PlayerPos);
 	void Knockback(Skeletons& skele, float KnockbackSpeed);
 	void Collision(Skeletons& skele, olc::vf2d PlayerPos, float PlayerSpeed);
@@ -45,6 +51,7 @@ public:
 	void DrawCalculation(olc::PixelGameEngine* pge, olc::vf2d PlayerPos, float PlayerSpeed, std::vector<Skeletons> Skeles);
 	void DrawBelowPlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles, bool DebugScreen);
 	void DrawAbovePlayer(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons> Skeles, bool DebugScreen);
+	void Wander(Skeletons& skele, float fElapsedTime);
 	void Functions(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons>& Skeles, float KnockbackSpeed, float PlayerSpeed, float fElapsedTime, olc::vf2d PlayerPos, bool& PlayerAttacked);
 	void Initialize();
 };

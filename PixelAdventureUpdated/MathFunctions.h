@@ -9,4 +9,7 @@ public:
 	static olc::vf2d GetWorldMousePos(olc::TileTransformedView& tv, olc::PixelGameEngine* pge);
 	static float PointTo(olc::vf2d pos1, olc::vf2d pos2);
 	uint32_t Lehmer32(uint32_t nLehmer);
+	uint32_t NoSeedLehmer32();
+	float NoSeedLehmerFloatRange(float min, float max);
+	void GenerateNewGoal(olc::vf2d Home, olc::vf2d& Goal, float min, float max);
 };

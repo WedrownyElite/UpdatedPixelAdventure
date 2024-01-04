@@ -39,62 +39,48 @@ void SkeletonFunctions::IsHit(olc::PixelGameEngine* pge, olc::TileTransformedVie
 	}
 }
 void SkeletonFunctions::Knockback(Skeletons& skele, float KnockbackSpeed) {
-	if (skele.SkeleHit == 1) {
-		// Red skeleton logic
-		if (skele.RedSkeleTimer <= 15) {
-			skele.RedSkeleTimer++;
-		}
-		else {
-			skele.RedSkele = 0;
-			skele.RedSkeleTimer = 0;
+	// Red skeleton logic
+	if (skele.RedSkeleTimer <= 15) {
+		skele.RedSkeleTimer++;
+	}
+	else {
+		skele.RedSkele = 0;
+		skele.RedSkeleTimer = 0;
+	}
+
+	// Knockback logic
+	if (skele.KnockbackDist <= 2.0f) {
+		// Apply horizontal knockback
+		skele.SkelePos -= skele.Direction * KnockbackSpeed;
+
+		// Apply upward jump
+		if (skele.KnockbackDist <= 0.25f) {
+			skele.SkelePos.y -= 0.25f;
 		}
 
-		// Knockback logic
-		if (skele.KnockbackDist <= 2.0f) {
-			// Apply horizontal knockback
-			skele.SkelePos -= skele.Direction * KnockbackSpeed;
-
-			// Apply upward jump
-			if (skele.KnockbackDist <= 0.25f) {
-				skele.SkelePos.y -= 0.25f;
-			}
-
-			skele.KnockbackDist += KnockbackSpeed;
-		}
-		else {
-			// Apply sliding when landing
-			if (skele.SkelePos.y < 0.0f) {
-				skele.SkelePos.y = 0.0f;
-				skele.SkelePos.x -= 0.5f;
-			}
-
-			skele.KnockbackDist = 0.0f;
-			skele.SkeleHit = 0;
-			skele.RedSkele = 0;
-			skele.RedSkeleTimer = 0;
-		}
+		skele.KnockbackDist += KnockbackSpeed;
+	}
+	else {
+		skele.KnockbackDist = 0.0f;
+		skele.SkeleHit = 0;
+		skele.RedSkele = 0;
+		skele.RedSkeleTimer = 0;
 	}
 }
 void SkeletonFunctions::Collision(Skeletons& skele, olc::vf2d PlayerPos, float PlayerSpeed) {
-	//Find distance
-	float dis = MF.GetDistance(skele.SkelePos, PlayerPos);
-	//Only run collision test if within 8 pixels
-	if (dis <= 8.0f) {
+	olc::vf2d Skele(skele.SkelePos.x - 0.5f, skele.SkelePos.y - 1.0f);
+	olc::vf2d UPlayerPos(PlayerPos.x - 0.5f, PlayerPos.y - 1.0f);
+	olc::vf2d PlayerSize(0.7f, 1.2f);
+	olc::vf2d SkeleSize(0.8f, 1.2f);
 
-		olc::vf2d Skele(skele.SkelePos.x - 0.5f, skele.SkelePos.y - 1.0f);
-		olc::vf2d UPlayerPos(PlayerPos.x - 0.5f, PlayerPos.y - 1.0f);
-		olc::vf2d PlayerSize(0.7f, 1.2f);
-		olc::vf2d SkeleSize(0.8f, 1.2f);
-
-		//Collision
-		if (Skele.x < UPlayerPos.x + PlayerSize.x
-			&& Skele.x + SkeleSize.x > UPlayerPos.x
-			&& Skele.y < UPlayerPos.y + PlayerSize.y
-			&& Skele.y + SkeleSize.y > UPlayerPos.y) {
-			//Direction of player
-			olc::vf2d dir = (PlayerPos - skele.SkelePos).norm();
-			skele.SkelePos += -dir * PlayerSpeed;
-		}
+	//Collision
+	if (Skele.x < UPlayerPos.x + PlayerSize.x
+		&& Skele.x + SkeleSize.x > UPlayerPos.x
+		&& Skele.y < UPlayerPos.y + PlayerSize.y
+		&& Skele.y + SkeleSize.y > UPlayerPos.y) {
+		//Direction of player
+		olc::vf2d dir = (PlayerPos - skele.SkelePos).norm();
+		skele.SkelePos += -dir * PlayerSpeed;
 	}
 }
 void SkeletonFunctions::SpawnSkeleton(std::vector<Skeletons>& Skeles) {
@@ -111,11 +97,13 @@ void SkeletonFunctions::SpawnSkeleton(std::vector<Skeletons>& Skeles) {
 
 		skeleton.SkeletonState = Skeletons::IDLE_LEFT;
 		//"bot" variables
-		skeleton.ActivityDirection = { 0.0f, 0.0f };
 		skeleton.CurrentlyActive = false;
 		skeleton.ActivityCooldownBool = true;
-		skeleton.ActivityCooldown = 0.0f;
-		skeleton.ActivityCooldownTarget = 0.0f;
+		skeleton.ActivityCooldown = 2.0f;
+		skeleton.HomePos = skeleton.SkelePos;
+		skeleton.WanderingGoal = skeleton.HomePos;
+		skeleton.GoalDist = 0.0f;
+		skeleton.WanderingDir = { 0.0f, 0.0f };
 		Skeles.push_back(skeleton);
 	}
 }
@@ -197,20 +185,69 @@ void SkeletonFunctions::DrawAbovePlayer(olc::TileTransformedView& tv, olc::Pixel
 		}
 	}
 }
+void SkeletonFunctions::Wander(Skeletons& skele, float fElapsedTime) {
+	//If no activity and no cooldown, give new activity
+	if (!skele.CurrentlyActive && !skele.ActivityCooldownBool) {
+		//Generate new goal
+		MF.GenerateNewGoal(skele.HomePos, skele.WanderingGoal, 1.5f, 2.7f);
+
+		//Calculate wandering direction
+		skele.WanderingDir = (skele.WanderingGoal - skele.SkelePos).norm();
+
+		//Switch state depending on dir facing
+		if (skele.WanderingDir.x < 0.0f && skele.WanderingDir.y <= 1.0f) {
+			skele.SkeletonState = Skeletons::IDLE_LEFT;
+		}
+		else {
+			skele.SkeletonState = Skeletons::IDLE_RIGHT;
+		}
+
+		skele.GoalDist = MF.GetDistance(skele.SkelePos, skele.WanderingGoal);
+		skele.CurrentlyActive = true;
+	}
+	//Currently active logic
+	if (skele.CurrentlyActive) {
+		if (skele.GoalDist > 0.0f) {
+			skele.SkelePos += skele.WanderingDir * IdleSpeed;
+			skele.GoalDist -= IdleSpeed;
+		}
+		if (skele.GoalDist <= 0.0f) {
+			float cooldown = MF.NoSeedLehmerFloatRange(2, 5);
+
+ 			skele.CurrentlyActive = false;
+			skele.GoalDist = 0.0f;
+			skele.ActivityCooldownBool = true;
+			skele.ActivityCooldown = cooldown;
+			skele.WanderingDir = { 0.0f, 0.0f };
+		}
+	}
+	//Idle timer
+	if (skele.ActivityCooldownBool == true) {
+		EF.IdleActivityTimer(fElapsedTime, skele.ActivityCooldown, skele.ActivityCooldownBool);
+	}
+}
 void SkeletonFunctions::Functions(olc::TileTransformedView& tv, olc::PixelGameEngine* pge, std::vector<Skeletons>& Skeles, float KnockbackSpeed, float PlayerSpeed, float fElapsedTime, olc::vf2d PlayerPos, bool& PlayerAttacked) {
+	IdleSpeed = 4.25f * fElapsedTime;
 	SpawnSkeleton(Skeles);
 	DrawCalculation(pge, PlayerPos, PlayerSpeed, Skeles);
 	for (int i = 0; i < Skeles.size(); i++) {
 		Skeletons& skele = Skeles[i];
+		//Find distance
+		float dis = MF.GetDistance(skele.SkelePos, PlayerPos);
 		//Hit check
-		if (PlayerAttacked == true) {
+		if (PlayerAttacked) {
 			IsHit(pge, tv, skele, PlayerAttacked, PlayerPos);
 		}
-		Knockback(skele, KnockbackSpeed);
-		Collision(skele, PlayerPos, PlayerSpeed);
-		if (Skeles[i].ActivityCooldownBool == true) {
-			EF.IdleActivityTimer(fElapsedTime, skele.ActivityCooldownTarget, skele.ActivityCooldown, skele.ActivityCooldownBool);
+		//Knockback
+		if (skele.SkeleHit == 1) {
+			Knockback(skele, KnockbackSpeed);
 		}
+		//Collision
+		//Only run collision test if within 8 pixels
+		if (dis <= 8.0f) {
+			Collision(skele, PlayerPos, PlayerSpeed);
+		}
+		Wander(skele, fElapsedTime);
 	}
 }
 void SkeletonFunctions::Initialize() {

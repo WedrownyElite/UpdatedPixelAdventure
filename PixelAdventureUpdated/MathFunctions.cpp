@@ -35,3 +35,47 @@ uint32_t MathFunctions::Lehmer32(uint32_t nLehmer) {
 	uint32_t m2 = (tmp >> 32) ^ tmp;
 	return m2;
 }
+uint32_t MathFunctions::NoSeedLehmer32() {
+	// Define static internal state
+	static uint32_t nLehmer = 734;
+
+	nLehmer += 0xe120fc15;
+	uint64_t tmp;
+	tmp = (uint64_t)nLehmer * 0x4a39b70d;
+	uint32_t m1 = (tmp >> 32) ^ tmp;
+	tmp = (uint64_t)m1 * 0x12fad5c0;
+	uint32_t m2 = (tmp >> 32) ^ tmp;
+
+	// Update internal state for the next call
+	nLehmer = m2;
+
+	return m2;
+}
+float MathFunctions::NoSeedLehmerFloatRange(float min, float max) {
+	float diff = max - min;
+	float cutRange = UINT_MAX / diff;
+	return ((NoSeedLehmer32() - cutRange) / cutRange + 1) + min;
+}
+void MathFunctions::GenerateNewGoal(olc::vf2d Home, olc::vf2d& Goal, float min, float max) {
+	for (int k = 0; k < 2; k++) {
+		//Generate float from 3 to 5
+		float randomGoal = NoSeedLehmerFloatRange(min, max);
+
+		//Random number for * -1 or * 1
+		int i = NoSeedLehmer32() % 1;
+
+		if (i == 0) {
+			randomGoal = randomGoal * -1;
+		}
+		else {
+			randomGoal = randomGoal * 1;
+		}
+		//Add x and y to Goal
+		if (k == 0) {
+			Goal.x = Home.x + randomGoal;
+		}
+		else {
+			Goal.y = Home.y + randomGoal;
+		}
+	}
+}

@@ -142,12 +142,6 @@ public:
 		DrawStringDecal({ 285.0f, 210.0f }, "f?", olc::BLUE, { 2.0f, 2.0f });
 		DrawStringDecal({ 340.0f, 210.0f }, AngleString, olc::WHITE, { 2.0f, 2.0f });
 
-		//RandoNum
-
-		std::string RandNumString = std::to_string(rand_num);
-
-		DrawStringDecal({ 10.0f, 250.0f }, RandNumString, olc::WHITE, { 2.0f, 2.0f });
-
 		//PlayerState
 		std::string PlayerStateString = std::to_string(GlobalVars::PlayerState);
 		std::string PlayerStateStringUpdated;
@@ -171,6 +165,32 @@ public:
 		}
 		DrawStringDecal({ 10.0f, 230.0f }, "PlayerState:", olc::BLUE, { 2.0f, 2.0f });
 		DrawStringDecal({ 210.0f, 230.0f }, PlayerStateStringUpdated, olc::WHITE, { 2.0f, 2.0f });
+
+		//Skele active
+		std::string CurrActvString = std::to_string(Skeles[0].CurrentlyActive);
+
+		DrawStringDecal({ 10.0f, 250.0f }, "Active?", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 150.0f, 250.0f }, CurrActvString, olc::WHITE, { 2.0f, 2.0f });
+
+		//Cooldown bool
+		std::string CooldownBoolString = std::to_string(Skeles[0].ActivityCooldownBool);
+		
+		DrawStringDecal({ 10.0f, 270.0f }, "Cooldown?", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 150.0f, 270.0f }, CooldownBoolString, olc::WHITE, { 2.0f, 2.0f });
+
+		//Skele goal
+		std::string SkeleGoalStringx = std::to_string(Skeles[0].WanderingGoal.x);
+		std::string SkeleGoalStringy = std::to_string(Skeles[0].WanderingGoal.y);
+
+		DrawStringDecal({ 10.0f, 290.0f }, "Goal:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 150.0f, 290.0f }, SkeleGoalStringx, olc::WHITE, { 2.0f, 2.0f });
+		DrawStringDecal({ 350.0f, 290.0f }, SkeleGoalStringy, olc::WHITE, { 2.0f, 2.0f });
+
+		//Goal dist
+		std::string GoalDistString = std::to_string(Skeles[0].GoalDist);
+
+		DrawStringDecal({ 10.0f, 310.0f }, "Goal Dist:", olc::BLUE, { 2.0f, 2.0f });
+		DrawStringDecal({ 200.0f, 310.0f }, GoalDistString, olc::WHITE, { 2.0f, 2.0f });
 	}
 	void DrawBGCamera() {
 		// Render "tile map", by getting visible tiles
